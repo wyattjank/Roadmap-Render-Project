@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-02-07T21:22:11.000Z" agent="Python" version="22.1.0" etag="roadmap" type="device">
+<mxfile host="app.diagrams.net" modified="2026-02-07T21:34:54.000Z" agent="Python" version="22.1.0" etag="roadmap" type="device">
   <diagram id="roadmap" name="Roadmap">
     <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1200" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="10" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;fillColor=#fafafa;strokeColor=#bdbdbd;strokeWidth=2;">
-          <mxGeometry x="16" y="0" width="1368" height="1288" as="geometry" />
+          <mxGeometry x="16" y="0" width="1368" height="1352" as="geometry" />
         </mxCell>
         <mxCell id="11" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="459.5" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="459.5" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="12" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="564.9" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="564.9" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="13" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="566.1" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="566.1" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="14" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="673.8" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="673.8" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="15" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="675.0" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="675.0" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="16" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="782.8" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="782.8" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="17" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="784.0" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="784.0" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="18" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="890.6" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="890.6" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="19" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="891.7" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="891.7" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="20" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="997.1" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="997.1" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="21" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="998.3" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="998.3" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="22" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="1106.1" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="1106.1" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="23" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="1107.3" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="1107.3" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="24" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="1215.0" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="1215.0" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="25" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="1216.2" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="1216.2" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="26" parent="1" vertex="1" style="fillColor=#e0e0e0;strokeColor=none;">
-          <mxGeometry x="1359.5" y="60" width="1" height="1148" as="geometry" />
+          <mxGeometry x="1359.5" y="60" width="1" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="27" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;fillColor=#d32f2f;strokeColor=none;">
-          <mxGeometry x="539.5" y="60" width="3" height="1148" as="geometry" />
+          <mxGeometry x="539.5" y="60" width="3" height="1212" as="geometry" />
         </mxCell>
         <mxCell id="28" parent="1" vertex="1" value="Roadmap (Dec 2025 – Dec 2027)" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#1a1a1a;">
           <mxGeometry x="40" y="4" width="500" height="24" as="geometry" />
@@ -210,10 +210,10 @@
           <mxGeometry x="44" y="988" width="172" height="24" as="geometry" />
         </mxCell>
         <mxCell id="78" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;fillColor=#f0f0f0;strokeColor=#999999;fontColor=#1a1a1a;">
-          <mxGeometry x="40" y="1016" width="180" height="192" as="geometry" />
+          <mxGeometry x="40" y="1016" width="180" height="256" as="geometry" />
         </mxCell>
         <mxCell id="79" parent="1" vertex="1" value="ONBOARDING TENANT APPS" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#1a1a1a;">
-          <mxGeometry x="44" y="1020" width="172" height="184" as="geometry" />
+          <mxGeometry x="44" y="1020" width="172" height="248" as="geometry" />
         </mxCell>
         <mxCell id="80" parent="1" vertex="1" value="CICD" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;fontSize=10;fontColor=#1a1a1a;">
           <mxGeometry x="224" y="92" width="212" height="56" as="geometry" />
@@ -258,10 +258,10 @@
           <mxGeometry x="224" y="988" width="212" height="24" as="geometry" />
         </mxCell>
         <mxCell id="94" parent="1" vertex="1" value="HSM DEV" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;fontSize=10;fontColor=#1a1a1a;">
-          <mxGeometry x="224" y="1020" width="212" height="88" as="geometry" />
+          <mxGeometry x="224" y="1020" width="212" height="120" as="geometry" />
         </mxCell>
         <mxCell id="95" parent="1" vertex="1" value="Tenant X PROD" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=#ffffff;align=left;verticalAlign=middle;fontSize=10;fontColor=#1a1a1a;">
-          <mxGeometry x="224" y="1116" width="212" height="88" as="geometry" />
+          <mxGeometry x="224" y="1148" width="212" height="120" as="geometry" />
         </mxCell>
         <mxCell id="96" parent="1" vertex="1" value="GitLab Support" style="rounded=1;whiteSpace=wrap;fillColor=#1f77b4;strokeColor=#333333;fontColor=#ffffff;fontSize=8;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
           <mxGeometry x="460.0" y="93.0" width="898.8" height="22" as="geometry" />
@@ -386,35 +386,41 @@
         <mxCell id="136" parent="1" vertex="1" value="HSM DEV (RMF 0-3)" style="rounded=1;whiteSpace=wrap;fillColor=#7f7f7f;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
           <mxGeometry x="513.3" y="1021.0" width="69.9" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="137" parent="1" vertex="1" value="Tenant X PROD (RMF 0-3)" style="rounded=1;whiteSpace=wrap;fillColor=#7f7f7f;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
-          <mxGeometry x="513.3" y="1053.0" width="69.9" height="22" as="geometry" />
+        <mxCell id="137" parent="1" vertex="1" value="HSM DEV Account Setup" style="rounded=1;whiteSpace=wrap;fillColor=#7f7f7f;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
+          <mxGeometry x="583.2" y="1053.0" width="72.2" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="138" parent="1" vertex="1" value="HSM DEV Account Setup" style="rounded=1;whiteSpace=wrap;fillColor=#7f7f7f;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
-          <mxGeometry x="583.2" y="1085.0" width="72.2" height="22" as="geometry" />
+        <mxCell id="138" parent="1" vertex="1" value="HSM DEV Account Integration" style="rounded=1;whiteSpace=wrap;fillColor=#7f7f7f;strokeColor=#333333;fontColor=#ffffff;fontSize=8;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
+          <mxGeometry x="655.4" y="1085.0" width="129.1" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="139" parent="1" vertex="1" value="Tenant X PROD Account Setup" style="rounded=1;whiteSpace=wrap;fillColor=#929292;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
-          <mxGeometry x="583.2" y="1117.0" width="72.2" height="22" as="geometry" />
+        <mxCell id="139" parent="1" vertex="1" value="HSM Multi-Tenant Resource Cleanup" style="rounded=1;whiteSpace=wrap;fillColor=#7f7f7f;strokeColor=#333333;fontColor=#ffffff;fontSize=6;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
+          <mxGeometry x="764.3" y="1117.0" width="24" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="140" parent="1" vertex="1" value="Tenant X PROD Account Integration" style="rounded=1;whiteSpace=wrap;fillColor=#929292;strokeColor=#333333;fontColor=#ffffff;fontSize=6;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
-          <mxGeometry x="655.4" y="1149.0" width="36.7" height="22" as="geometry" />
+        <mxCell id="140" parent="1" vertex="1" value="Tenant X PROD (RMF 0-3)" style="rounded=1;whiteSpace=wrap;fillColor=#929292;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
+          <mxGeometry x="513.3" y="1149.0" width="69.9" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="141" parent="1" vertex="1" value="Tenant X PROD ATO" style="rounded=1;whiteSpace=wrap;fillColor=#929292;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
-          <mxGeometry x="655.4" y="1181.0" width="55.7" height="22" as="geometry" />
+        <mxCell id="141" parent="1" vertex="1" value="Tenant X PROD Account Setup" style="rounded=1;whiteSpace=wrap;fillColor=#929292;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
+          <mxGeometry x="583.2" y="1181.0" width="72.2" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="142" parent="1" vertex="1" value="Legend:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#1a1a1a;">
-          <mxGeometry x="40" y="1220" width="60" height="18" as="geometry" />
+        <mxCell id="142" parent="1" vertex="1" value="Tenant X PROD Account Integration" style="rounded=1;whiteSpace=wrap;fillColor=#929292;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
+          <mxGeometry x="655.4" y="1213.0" width="55.7" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="143" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;fillColor=#2E7D32;strokeColor=none;">
-          <mxGeometry x="40" y="1246" width="8" height="14" as="geometry" />
+        <mxCell id="143" parent="1" vertex="1" value="Tenant X PROD ATO" style="rounded=1;whiteSpace=wrap;fillColor=#929292;strokeColor=#333333;fontColor=#ffffff;fontSize=7;align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;">
+          <mxGeometry x="655.4" y="1245.0" width="55.7" height="22" as="geometry" />
         </mxCell>
-        <mxCell id="144" parent="1" vertex="1" value="Baseline (primary offering)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#1a1a1a;">
-          <mxGeometry x="54" y="1242" width="200" height="22" as="geometry" />
+        <mxCell id="144" parent="1" vertex="1" value="Legend:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#1a1a1a;">
+          <mxGeometry x="40" y="1284" width="60" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="145" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;fillColor=#FFF3E0;strokeColor=#EF6C00;dashPattern=1 2 1 2;strokeWidth=1;">
-          <mxGeometry x="260" y="1248" width="24" height="10" as="geometry" />
+        <mxCell id="145" parent="1" vertex="1" style="rounded=0;whiteSpace=wrap;fillColor=#2E7D32;strokeColor=none;">
+          <mxGeometry x="40" y="1310" width="8" height="14" as="geometry" />
         </mxCell>
-        <mxCell id="146" parent="1" vertex="1" value="Optional" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#1a1a1a;">
-          <mxGeometry x="290" y="1242" width="120" height="22" as="geometry" />
+        <mxCell id="146" parent="1" vertex="1" value="Baseline (primary offering)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#1a1a1a;">
+          <mxGeometry x="54" y="1306" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="147" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;fillColor=#FFF3E0;strokeColor=#EF6C00;dashPattern=1 2 1 2;strokeWidth=1;">
+          <mxGeometry x="260" y="1312" width="24" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="148" parent="1" vertex="1" value="Optional" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#1a1a1a;">
+          <mxGeometry x="290" y="1306" width="120" height="22" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

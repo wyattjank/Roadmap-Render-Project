@@ -2,9 +2,11 @@ domain,feature,task,start_date,end_date,notes,flag
 O&M Existing Tenant Apps,O&M Existing Tenant Apps,Existing Tenant O&M Support,2025-12-01,2027-12-31,"Reducing incident rate for Tier 1 tenants",
 Onboarding Tenant Apps,HSM DEV,HSM DEV (RMF 0-3),2026-01-15,2026-03-15,,
 Onboarding Tenant Apps,HSM DEV,HSM DEV Account Setup,2026-03-15,2026-05-15,,
-Onboarding Tenant Apps,HSM DEV,Tenant X PROD (RMF 0-3),2026-01-15,2026-03-15,,
+Onboarding Tenant Apps,HSM DEV,HSM DEV Account Integration,2026-05-15,2026-09-01,
+Onboarding Tenant Apps,HSM DEV,HSM Multi-Tenant Resource Cleanup,2026-08-15,2026-09-01,
+Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD (RMF 0-3),2026-01-15,2026-03-15,,
 Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD Account Setup,2026-03-15,2026-05-15,,
-Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD Account Integration,2026-05-15,2026-06-15,,
+Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD Account Integration,2026-05-15,2026-07-01,,
 Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD ATO,2026-05-15,2026-07-01,,
 Core Services,Kubernetes (Rancher),Rancher RKE1 support,2025-12-01,2026-05-31,Initial EKS support through R2,optional
 Core Services,Kubernetes (Rancher),Rancher RKE2 development,2025-12-01,2026-03-30,Initial EKS support through R2,optional

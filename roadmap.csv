@@ -1,0 +1,34 @@
+domain,feature,task,start_date,end_date,notes,flag
+O&M Existing Tenant Apps,O&M Existing Tenant Apps,Existing Tenant O&M Support,2025-12-01,2027-12-31,"Reducing incident rate for Tier 1 tenants",
+Onboarding Tenant Apps,HSM DEV,HSM DEV (RMF 0-3),2026-01-15,2026-03-15,,
+Onboarding Tenant Apps,HSM DEV,HSM DEV Account Setup,2026-03-15,2026-05-15,,
+Onboarding Tenant Apps,HSM DEV,Tenant X PROD (RMF 0-3),2026-01-15,2026-03-15,,
+Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD Account Setup,2026-03-15,2026-05-15,,
+Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD Account Integration,2026-05-15,2026-06-15,,
+Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD ATO,2026-05-15,2026-07-01,,
+Core Services,Kubernetes (Rancher),Rancher RKE1 support,2025-12-01,2026-05-31,Initial EKS support through R2,optional
+Core Services,Kubernetes (Rancher),Rancher RKE2 development,2025-12-01,2026-03-30,Initial EKS support through R2,optional
+Core Services,Kubernetes (Rancher),Rancher RKE2 Tenant Migration,2026-04-01,2026-05-30,Initial EKS support through R2,optional
+Core Services,Kubernetes (Rancher),Rancher RKE2 Tenant Support,2026-04-01,2027-12-30,Initial EKS support through R2,optional
+Core Services,Kubernetes (EKS),EKS v1 support,2025-12-01,2026-05-31,Initial EKS support through R2,baseline
+Core Services,Kubernetes (EKS),EKS v2 config,2026-02-01,2026-04-30,EKS v2 configuration and rollout,baseline
+Core Services,Kubernetes (EKS),AL2023 AMI hardening and STIG,2026-01-01,2026-03-31,AMI hardening and STIG compliance,baseline
+Core Services,Kubernetes (EKS),Multi-cluster federation,2026-02-01,2026-07-31,Enables regional failover,baseline
+Core Services,Observability,Elastic Support,2025-12-01,2026-05-30,Standard observability stack,baseline
+Core Services,Observability,Elastic Support,2026-05-30,2027-12-30,Standard observability stack,optional
+Core Services,Observability,Prometheus/Grafana Support,2025-12-01,2026-05-30,Standard observability stack,optional
+Core Services,Observability,Prometheus/Grafana Add-ons,2025-12-01,2026-05-30,Standard observability stack,optional
+Core Services,Observability,Prometheus/Grafana Support,2026-05-30,2027-12-30,Standard observability stack,baseline
+Core Services,OAuth,Keycloak OAUTH2 Support,2025-12-01,2026-05-30,External IdP federation, baseline
+Core Services,OAuth,F5 Support,2025-12-01,2026-05-30,Removes dependency of IDAMS LDAP Password and resource configuration and O&M,optional
+Core Services,OAuth,F5/DEX/OAUTH2 Developmment,2026-01-30,2026-05-30,Effectively replaces Keycloak so that we can move forward with less external dependencies and a lighter weight baseline to reduce O&M,baseline
+Core Services,OAuth,F5/DEX/OAUTH2 Support,2026-05-30,2027-12-30,Effectively replaces Keycloak so that we can move forward with less external dependencies and a lighter weight baseline to reduce O&M,baseline
+Core Services,CICD,Golden pipeline templates,2026-01-01,2026-04-30,Standardized pipelines across tenants,
+Core Services,Image Repository,Private hardened registry,2026-04-01,2026-08-31,FIPS compliant artifact storage,
+Core Support Services,Resiliency,Multi-region DR automation,2026-06-01,2026-12-31,Automated failover testing,
+Core Support Services,AI Enablements,Platform AI assistant beta,2026-07-15,2027-03-31,Operator productivity tooling,
+Core Support Services,Landing Page,Unified platform portal,2026-02-01,2026-06-30,Single entry point for tenants,
+FVEY C2S Core,FVEY C2S Core,Cross-domain service mesh,2026-04-01,2026-10-31,Secure multi-domain networking,
+FVEY C2S Support,FVEY C2S Support,FVEY compliance automation,2026-05-01,2026-12-31,Continuous compliance enforcement,
+DEV C2S Core,DEV C2S Core,DEV enclave platform baseline,2025-12-01,2026-06-30,Initial DEV enclave rollout,
+DEV C2S Support,DEV C2S Support,DEV enclave operational tooling,2026-03-01,2026-09-30,Logging monitoring and support tooling,

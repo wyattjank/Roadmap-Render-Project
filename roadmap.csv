@@ -23,7 +23,9 @@ Core Services,OAuth,Keycloak OAUTH2 Support,2025-12-01,2026-05-30,External IdP f
 Core Services,OAuth,F5 Support,2025-12-01,2026-05-30,Removes dependency of IDAMS LDAP Password and resource configuration and O&M,optional
 Core Services,OAuth,F5/DEX/OAUTH2 Developmment,2026-01-30,2026-05-30,Effectively replaces Keycloak so that we can move forward with less external dependencies and a lighter weight baseline to reduce O&M,baseline
 Core Services,OAuth,F5/DEX/OAUTH2 Support,2026-05-30,2027-12-30,Effectively replaces Keycloak so that we can move forward with less external dependencies and a lighter weight baseline to reduce O&M,baseline
-Core Services,CICD,Golden pipeline templates,2026-01-01,2026-04-30,Standardized pipelines across tenants,
+Core Services,OAuth,F5/DEX/OAUTH2 Support,2026-05-30,2027-12-30,Effectively replaces Keycloak so that we can move forward with less external dependencies and a lighter weight baseline to reduce O&M,baseline
+Core Services,CICD,GitLab Support,2025-12-01,2027-12-30,"Standardized pipelines across tenants, hardenening scripts, devops tools like certbot",baseline
+Core Services,CICD,Bitbucket -> GitLab Migration,2026-09-01,2027-05-30,There might not be much of a reason to migrate from bitbucket other than consistency but it needs to be understood how we can keep the tf state the same if we execute migration,
 Core Services,Image Repository,Private hardened registry,2026-04-01,2026-08-31,FIPS compliant artifact storage,
 Core Support Services,Resiliency,Multi-region DR automation,2026-06-01,2026-12-31,Automated failover testing,
 Core Support Services,AI Enablements,Platform AI assistant beta,2026-07-15,2027-03-31,Operator productivity tooling,

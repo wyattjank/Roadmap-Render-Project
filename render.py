@@ -210,7 +210,14 @@ def _prepare_roadmap(roadmap: pd.DataFrame) -> pd.DataFrame:
         df["flag"] = f.where(f.isin(FLAG_VALUES), None).replace("", None).replace("nan", None)
     else:
         df["flag"] = None
-    return df.sort_values(["domain", "row_feature", "start"])
+    # Order by first appearance in CSV: domain order, then feature order, then start date
+    domain_order = {d: i for i, d in enumerate(df["domain"].drop_duplicates())}
+    df["_domain_ord"] = df["domain"].map(domain_order)
+    feature_key = df["domain"] + "\0" + df["row_feature"]
+    feature_order = {k: i for i, k in enumerate(feature_key.drop_duplicates())}
+    df["_feature_ord"] = feature_key.map(feature_order)
+    df = df.sort_values(["_domain_ord", "_feature_ord", "start"]).drop(columns=["_domain_ord", "_feature_ord"])
+    return df
 
 
 def _roadmap_by_domain_feature(roadmap: pd.DataFrame):
@@ -300,7 +307,7 @@ def export_to_excel(roadmap: pd.DataFrame, releases: pd.DataFrame, path: Path) -
     bold_bottom = Side(style="medium")
     thin_bottom = Side(style="thin")
     flag_baseline_left = Side(style="medium", color="2E7D32")   # green accent for baseline (e.g. EKS)
-    flag_optional_left = Side(style="dashed", color="EF6C00")   # orange dashed for optional (e.g. Rancher)
+    flag_optional_left = Side(style="mediumDashed", color="EF6C00")   # orange bold dashed for optional (e.g. Rancher)
 
     ws_vis = wb.create_sheet("Timeline", 0)
     domain_col, feature_col, task_col = 1, 2, 3
@@ -459,7 +466,7 @@ def export_to_excel(roadmap: pd.DataFrame, releases: pd.DataFrame, path: Path) -
     ws_vis.column_dimensions["B"].width = 18
     ws_vis.column_dimensions["C"].width = 32
     for c in range(4, n_months + label_col_w):
-        ws_vis.column_dimensions[openpyxl.utils.get_column_letter(c)].width = 4
+        ws_vis.column_dimensions[openpyxl.utils.get_column_letter(c)].width = 8
     ws_vis.freeze_panes = "D4"
 
     # ---- Sheet 2: Roadmap data (Month/Year for dates) ----

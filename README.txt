@@ -3,8 +3,8 @@
 ================================================================================
 
 This script reads roadmap.csv and releases.csv and generates:
-  - roadmap.xlsx   (Excel timeline + data sheets)
-  - roadmap.drawio (draw.io diagram)
+  - roadmap.xlsx   (Excel: Timeline sheet with Gantt bars, Roadmap data, Releases; legend for baseline/optional)
+  - roadmap.drawio (draw.io diagram with same structure and legend)
 
 --------------------------------------------------------------------------------
 1. PREREQUISITES
@@ -89,7 +89,8 @@ render.py as the working directory. All paths are relative to that folder.
 
   Edit roadmap.csv and/or releases.csv in any text editor or spreadsheet app.
   See CSV_FORMAT.md for column definitions (domain, feature, task, start_date,
-  end_date, notes, optional flag).
+  end_date, notes, flag). Flag: baseline = primary offering (green accent);
+  optional = optional offering (orange dashed accent).
 
   After saving the CSVs, run:
 

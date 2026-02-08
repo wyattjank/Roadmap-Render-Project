@@ -24,8 +24,8 @@
   `Core Services,CICD,Golden pipeline templates,2026-01-01,2026-04-30`
 
 - **Multiple tasks under one feature (bars can overlap):**  
-  `Core Services,Kubernetes (EKS),EKS v1 support,2025-12-01,2026-05-31,,,baseline`  
-  `Core Services,Kubernetes (Rancher),Rancher RKE1 support,2025-12-01,2026-05-31,,,optional`
+  `Core Services,Kubernetes (EKS),EKS v1 support,2025-12-01,2026-05-31,,baseline`  
+  `Core Services,Kubernetes (Rancher),Rancher RKE1 support,2025-12-01,2026-05-31,,optional`
 
 - **Flag:** Use `baseline` for the primary path (e.g. EKS) and `optional` for alternative/optional work (e.g. Rancher). Leave empty for no accent.
 
@@ -63,4 +63,5 @@ To add a release: add a new row with **release**, **start_date**, and **end_date
 - **Dates:** Use `YYYY-MM-DD` (e.g. `2026-02-01`). Month/year only is also supported in the script.
 - **Column names:** Case doesn’t matter; spaces become underscores (e.g. `start_date` or `Start Date`).
 - **Encoding:** Save CSVs as UTF-8 so special characters display correctly.
-- **Order:** Rows are sorted by domain → feature → start date. You can keep rows in any order in the CSV.
+- **Order:** Domain order and feature order follow **first appearance in the CSV**. Put the first row of each domain in the order you want domains to appear; within a domain, the first row of each feature sets that feature’s order. Tasks within each feature are sorted by start date.
+- **Commas in notes:** If a cell contains a comma, wrap the whole value in double quotes (e.g. `"Standardized pipelines, devops tools"`).

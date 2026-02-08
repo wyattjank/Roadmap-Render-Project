@@ -1,9 +1,9 @@
 domain,feature,task,start_date,end_date,notes,flag
-O&M Existing Tenant Apps,O&M Existing Tenant Apps,Existing Tenant O&M Support,2025-12-01,2027-12-31,"Reducing incident rate for Tier 1 tenants",
+O&M Existing Tenant Apps,O&M Existing Tenant Apps,Existing Tenant O&M Support,2025-12-01,2027-12-31,Reducing incident rate for Tier 1 tenants,
 Onboarding Tenant Apps,HSM DEV,HSM DEV (RMF 0-3),2026-01-15,2026-03-15,,
 Onboarding Tenant Apps,HSM DEV,HSM DEV Account Setup,2026-03-15,2026-05-15,,
-Onboarding Tenant Apps,HSM DEV,HSM DEV Account Integration,2026-05-15,2026-09-01,
-Onboarding Tenant Apps,HSM DEV,HSM Multi-Tenant Resource Cleanup,2026-08-15,2026-09-01,
+Onboarding Tenant Apps,HSM DEV,HSM DEV Account Integration,2026-05-15,2026-09-01,,
+Onboarding Tenant Apps,HSM DEV,HSM Multi-Tenant Resource Cleanup,2026-08-15,2026-09-01,,
 Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD (RMF 0-3),2026-01-15,2026-03-15,,
 Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD Account Setup,2026-03-15,2026-05-15,,
 Onboarding Tenant Apps,Tenant X PROD,Tenant X PROD Account Integration,2026-05-15,2026-07-01,,
@@ -16,20 +16,31 @@ Core Services,Kubernetes (EKS),EKS v1 support,2025-12-01,2026-05-31,Initial EKS 
 Core Services,Kubernetes (EKS),EKS v2 config,2026-02-01,2026-04-30,EKS v2 configuration and rollout,baseline
 Core Services,Kubernetes (EKS),AL2023 AMI hardening and STIG,2026-01-01,2026-03-31,AMI hardening and STIG compliance,baseline
 Core Services,Kubernetes (EKS),Multi-cluster federation,2026-02-01,2026-07-31,Enables regional failover,baseline
+Core Services,Kubernetes (EKS Auto),EKS Auto Discovery,2026-02-01,2026-04-01,"Read up on EKS auto, meet w AWS for questions, deliver findings to client",
+Core Services,Kubernetes (EKS Auto),EKS Auto Platform Implementation,2026-04-01,2026-06-01,"Test EKS Auto, will have to have complete for Tenant X by 07-01",
 Core Services,Observability,Elastic Support,2025-12-01,2026-05-30,Standard observability stack,baseline
 Core Services,Observability,Elastic Support,2026-05-30,2027-12-30,Standard observability stack,optional
 Core Services,Observability,Prometheus/Grafana Support,2025-12-01,2026-05-30,Standard observability stack,optional
 Core Services,Observability,Prometheus/Grafana Add-ons,2025-12-01,2026-05-30,Standard observability stack,optional
 Core Services,Observability,Prometheus/Grafana Support,2026-05-30,2027-12-30,Standard observability stack,baseline
-Core Services,OAuth,Keycloak OAUTH2 Support,2025-12-01,2026-05-30,External IdP federation, baseline
+Core Services,OAuth,Keycloak OAUTH2 Support,2025-12-01,2026-05-30,External IdP federation,baseline
 Core Services,OAuth,F5 Support,2025-12-01,2026-05-30,Removes dependency of IDAMS LDAP Password and resource configuration and O&M,optional
 Core Services,OAuth,F5/DEX/OAUTH2 Developmment,2026-01-30,2026-05-30,Effectively replaces Keycloak so that we can move forward with less external dependencies and a lighter weight baseline to reduce O&M,baseline
 Core Services,OAuth,F5/DEX/OAUTH2 Support,2026-05-30,2027-12-30,Effectively replaces Keycloak so that we can move forward with less external dependencies and a lighter weight baseline to reduce O&M,baseline
 Core Services,OAuth,F5/DEX/OAUTH2 Support,2026-05-30,2027-12-30,Effectively replaces Keycloak so that we can move forward with less external dependencies and a lighter weight baseline to reduce O&M,baseline
 Core Services,CICD,GitLab Support,2025-12-01,2027-12-30,"Standardized pipelines across tenants, hardenening scripts, devops tools like certbot",baseline
 Core Services,CICD,Bitbucket -> GitLab Migration,2026-09-01,2027-05-30,There might not be much of a reason to migrate from bitbucket other than consistency but it needs to be understood how we can keep the tf state the same if we execute migration,
-Core Services,Image Repository,Private hardened registry,2026-04-01,2026-08-31,FIPS compliant artifact storage,
-Core Support Services,Resiliency,Multi-region DR automation,2026-06-01,2026-12-31,Automated failover testing,
+Core Services,Image Repository,Harbor Implementation (CY failover),2025-12-01,2026-03-31,CY failover solution to maintain platform conainer images,
+Core Services,Image Repository,Internal PROD ECR Implementation,2026-01-01,2026-03-01,Test AMI pipeline images to ECR,
+Core Services,Image Repository,Internal PROD ECR Migration,2026-03-01,2026-05-01,Migrate all platform images to ECR,
+Core Services,Image Repository,ECR Baseline,2026-05-01,2027-12-01,This eliminates the dependency of CY and will deprecate the need of Harbor such to improve platform efficiencies by utilizing cloud native solutions and reduce resources,baseline
+Resiliency,WEST Standalone Account,WEST Asset RMF (0-3),2026-02-01,2026-04-01,Create WEST asset and get account IATT,
+Resiliency,WEST Standalone Account,WEST Standalone Asset Discovery ,2026-04-01,2026-10-31,Discover phase of west standalone,
+Resiliency,WEST Standalone Account,WEST Standalone Account Build,2026-06-01,2026-10-31,Wrap up standalone west potential,
+Resiliency,EAST -> West Failover,EAST -> WEST Failover Discovery,2026-06-01,2026-08-01,,
+Resiliency,EAST -> West Failover,EAST -> WEST Failover Implementation,2026-08-01,2027-04-01,,
+Resiliency,EAST -> West Failover,EAST -> WEST Failover Testing,2027-03-01,2027-07-01,,
+Resiliency,FIS Implementation,FIS Support,2025-12-01,2027-12-31,,
 Core Support Services,AI Enablements,Platform AI assistant beta,2026-07-15,2027-03-31,Operator productivity tooling,
 Core Support Services,Landing Page,Unified platform portal,2026-02-01,2026-06-30,Single entry point for tenants,
 FVEY C2S Core,FVEY C2S Core,Cross-domain service mesh,2026-04-01,2026-10-31,Secure multi-domain networking,

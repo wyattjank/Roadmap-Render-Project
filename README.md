@@ -2,6 +2,67 @@
 
 Edit a release roadmap in the browser (Agile board by domain), save draft CSV, publish to live, export Excel, and render legacy `roadmap.xlsx` / `roadmap.drawio` via `render.py`.
 
+---
+
+## How to run (start here)
+
+Open the project folder in **Cursor** (or any terminal). All commands are from the **project root** (where `start-admin.ps1` and `render.py` live).
+
+### First time on this computer
+
+```powershell
+git pull
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+.\start-admin.ps1
+```
+
+If PowerShell blocks the activate script:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+Then open in your browser:
+
+**http://127.0.0.1:8080/?token=dev-admin**
+
+Leave the terminal open while you use the app. Press `Ctrl+C` to stop the server.
+
+`start-admin.ps1` will run `npm install` / `npm run build` only if the UI build is missing (`web\static\dist`). That step needs Node.js and network access unless you already pulled a pre-built `web/static/dist` from git (see [docs/WORK-SETUP.md](docs/WORK-SETUP.md)).
+
+### Every day after that
+
+```powershell
+git pull
+.\.venv\Scripts\Activate.ps1
+.\start-admin.ps1
+```
+
+Same URL: **http://127.0.0.1:8080/?token=dev-admin** — hard refresh with `Ctrl+Shift+R` after a `git pull` if the UI looks stale.
+
+### Work machine / corporate firewall
+
+- Running the app uses **localhost only** (no internet needed while editing).
+- `git pull`, `pip install`, and `npm install` may need VPN, proxy, or a pre-built UI from home.
+- Full steps: **[docs/WORK-SETUP.md](docs/WORK-SETUP.md)**
+
+### Optional: push built UI so work does not need npm
+
+On a machine where the app already builds:
+
+```powershell
+cd web\frontend
+npm run build
+cd ..\..
+git add -f web/static/dist
+git commit -m "Include built UI for work machines"
+git push
+```
+
+---
+
 ## Dependencies
 
 ### Python (API + Excel export)
@@ -38,12 +99,6 @@ npm run build    # output → web/static/dist
 | Vite 6 | Bundler |
 | React 19 | Admin UI |
 | Tailwind CSS 4 | Styling |
-
-**Quick start (Windows):** `.\start-admin.ps1` — installs UI deps if needed, builds, sets `ROADMAP_ADMIN_TOKEN=dev-admin`, starts uvicorn on port 8080.
-
-Open: `http://127.0.0.1:8080/?token=dev-admin`
-
-**Work machine / corporate firewall:** see **[docs/WORK-SETUP.md](docs/WORK-SETUP.md)** (git pull in Cursor, pip/npm proxy, pre-built UI).
 
 ## Data files
 

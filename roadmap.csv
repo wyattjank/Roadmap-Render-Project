@@ -13,15 +13,15 @@ Core Services,Kubernetes (Rancher),Rancher RKE2 development,2025-12-01,2026-03-3
 Core Services,Kubernetes (Rancher),Rancher RKE2 Tenant Migration,2026-04-01,2026-05-30,Initial EKS support through R2,optional
 Core Services,Kubernetes (Rancher),Rancher RKE2 Tenant Support,2026-04-01,2027-12-30,Initial EKS support through R2,optional
 Core Services,Kubernetes (EKS),EKS v1 support,2025-12-01,2026-05-31,Initial EKS support through R2,baseline
-Core Services,Kubernetes (EKS),EKS v2 config,2026-02-01,2026-04-30,EKS v2 configuration and rollout,baseline
 Core Services,Kubernetes (EKS),AL2023 AMI hardening and STIG,2026-01-01,2026-03-31,AMI hardening and STIG compliance,baseline
+Core Services,Kubernetes (EKS),EKS v2 config,2026-02-01,2026-04-30,EKS v2 configuration and rollout,baseline
 Core Services,Kubernetes (EKS),Multi-cluster federation,2026-02-01,2026-07-31,Enables regional failover,baseline
 Core Services,Kubernetes (EKS Auto),EKS Auto Discovery,2026-02-01,2026-04-01,"Read up on EKS auto, meet w AWS for questions, deliver findings to client",
 Core Services,Kubernetes (EKS Auto),EKS Auto Platform Implementation,2026-04-01,2026-06-01,"Test EKS Auto, will have to have complete for Tenant X by 07-01",
 Core Services,Observability,Elastic Support,2025-12-01,2026-05-30,Standard observability stack,baseline
-Core Services,Observability,Elastic Support,2026-05-30,2027-12-30,Standard observability stack,optional
 Core Services,Observability,Prometheus/Grafana Support,2025-12-01,2026-05-30,Standard observability stack,optional
 Core Services,Observability,Prometheus/Grafana Add-ons,2025-12-01,2026-05-30,Standard observability stack,optional
+Core Services,Observability,Elastic Support,2026-05-30,2027-12-30,Standard observability stack,optional
 Core Services,Observability,Prometheus/Grafana Support,2026-05-30,2027-12-30,Standard observability stack,baseline
 Core Services,OAuth,Keycloak OAUTH2 Support,2025-12-01,2026-05-30,External IdP federation,baseline
 Core Services,OAuth,F5 Support,2025-12-01,2026-05-30,Removes dependency of IDAMS LDAP Password and resource configuration and O&M,optional
@@ -35,7 +35,7 @@ Core Services,Image Repository,Internal PROD ECR Implementation,2026-01-01,2026-
 Core Services,Image Repository,Internal PROD ECR Migration,2026-03-01,2026-05-01,Migrate all platform images to ECR,
 Core Services,Image Repository,ECR Baseline,2026-05-01,2027-12-01,This eliminates the dependency of CY and will deprecate the need of Harbor such to improve platform efficiencies by utilizing cloud native solutions and reduce resources,baseline
 Resiliency,WEST Standalone Account,WEST Asset RMF (0-3),2026-02-01,2026-04-01,Create WEST asset and get account IATT,
-Resiliency,WEST Standalone Account,WEST Standalone Asset Discovery ,2026-04-01,2026-10-31,Discover phase of west standalone,
+Resiliency,WEST Standalone Account,WEST Standalone Asset Discovery,2026-04-01,2026-10-31,Discover phase of west standalone,
 Resiliency,WEST Standalone Account,WEST Standalone Account Build,2026-06-01,2026-10-31,Wrap up standalone west potential,
 Resiliency,EAST -> West Failover,EAST -> WEST Failover Discovery,2026-06-01,2026-08-01,,
 Resiliency,EAST -> West Failover,EAST -> WEST Failover Implementation,2026-08-01,2027-04-01,,
@@ -47,3 +47,5 @@ FVEY C2S Core,FVEY C2S Core,Cross-domain service mesh,2026-04-01,2026-10-31,Secu
 FVEY C2S Support,FVEY C2S Support,FVEY compliance automation,2026-05-01,2026-12-31,Continuous compliance enforcement,
 DEV C2S Core,DEV C2S Core,DEV enclave platform baseline,2025-12-01,2026-06-30,Initial DEV enclave rollout,
 DEV C2S Support,DEV C2S Support,DEV enclave operational tooling,2026-03-01,2026-09-30,Logging monitoring and support tooling,
+Onboarding Tenant Apps,Onboarding Tenant Apps,NEW 1,2026-06-01,2026-08-31,,
+Onboarding Tenant Apps,Onboarding Tenant Apps,NEW 3,2026-06-01,2026-08-31,,

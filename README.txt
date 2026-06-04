@@ -6,6 +6,9 @@ This script reads roadmap.csv and releases.csv and generates:
   - roadmap.xlsx   (Excel: Timeline sheet with Gantt bars, Roadmap data, Releases; legend for baseline/optional)
   - roadmap.drawio (draw.io diagram with same structure and legend)
 
+Web admin (edit in browser, ECS-ready POC): see WEB.md
+  - uvicorn web.app:app  +  ROADMAP_ADMIN_TOKEN
+
 --------------------------------------------------------------------------------
 1. PREREQUISITES
 --------------------------------------------------------------------------------

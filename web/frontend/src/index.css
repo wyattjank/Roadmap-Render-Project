@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+
+@theme {
+  /* System stack only — no CDN fonts (airgapped-safe) */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --app-bg: #f9fafb;
+  --app-surface: #ffffff;
+  --app-surface-muted: #f3f4f6;
+  --app-border: #e5e7eb;
+  --app-border-strong: #d1d5db;
+  --app-text: #111827;
+  --app-text-muted: #6b7280;
+  --app-header: #ffffff;
+  --app-accent: #3b82f6;
+  --app-grid: #f3f4f6;
+  --app-task-bg: #ffffff;
+  --app-task-border: #9ca3af;
+  --app-task-border-flag: #f97316;
+  --app-release-header: #ffffff;
+  --app-month-today: #fef2f2;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --app-bg: #0d1117;
+  --app-surface: #161b22;
+  --app-surface-muted: #21262d;
+  --app-border: #30363d;
+  --app-border-strong: #484f58;
+  --app-text: #e6edf3;
+  --app-text-muted: #8b949e;
+  --app-header: #161b22;
+  --app-accent: #58a6ff;
+  --app-grid: #21262d;
+  --app-task-bg: #1c2128;
+  --app-task-border: #6e7681;
+  --app-task-border-flag: #d29922;
+  --app-release-header: #1c2128;
+  --app-month-today: #3d1214;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  @apply antialiased;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+.theme-header {
+  background: var(--app-header);
+  border-color: var(--app-border);
+}
+
+.theme-surface {
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+.theme-muted {
+  background: var(--app-surface-muted);
+  color: var(--app-text-muted);
+}
+
+.theme-border {
+  border-color: var(--app-border);
+}
+
+.theme-input {
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
+}
+
+.theme-input:focus {
+  background: var(--app-surface);
+  border-color: var(--app-accent);
+  outline: none;
+}
+
+.theme-btn-ghost:hover {
+  background: var(--app-surface-muted);
+}
+
+.theme-grid-bg {
+  background: var(--app-grid);
+}
+
+.theme-task-solid {
+  border: 2px solid var(--app-task-border);
+}
+
+.theme-task-dashed {
+  border: 2px dashed var(--app-task-border-flag);
+}
+
+.theme-release-pill {
+  background: var(--app-release-header);
+  border: 1px solid var(--app-border);
+}
+
+.theme-panel {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+
+.theme-label {
+  color: var(--app-text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Board: single overflow scrollport; sticky timeline stays aligned when scrolling X/Y */
+.board-scrollport {
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.board-scroll-inner {
+  min-width: max-content;
+}
+
+.board-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--app-bg);
+  isolation: isolate;
+  box-shadow: 0 1px 0 var(--app-border);
+}

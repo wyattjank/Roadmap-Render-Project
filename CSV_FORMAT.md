@@ -16,7 +16,8 @@
 | start_date | Yes      | Start date. Use `YYYY-MM-DD` (e.g. 2026-01-15). |
 | end_date   | Yes      | End date. Use `YYYY-MM-DD`. |
 | notes      | No       | Free text. |
-| flag       | No       | `baseline` = primary offering (e.g. EKS); `optional` = optional offering (e.g. Rancher); empty = no flag. Drives a visual accent on the task bar. |
+| flag       | No       | `yes` or `no` (empty = no). `yes` = dashed border / talking point in the admin UI. Legacy `baseline` / `optional` still load as flagged. |
+| flag_label | No       | Text shown on the card when `flag` is `yes` (e.g. At Risk, Customer Dependent, BLOCKED/DELAYED). |
 
 **Examples**
 
@@ -27,7 +28,7 @@
   `Core Services,Kubernetes (EKS),EKS v1 support,2025-12-01,2026-05-31,,baseline`  
   `Core Services,Kubernetes (Rancher),Rancher RKE1 support,2025-12-01,2026-05-31,,optional`
 
-- **Flag:** Use `baseline` for the primary path (e.g. EKS) and `optional` for alternative/optional work (e.g. Rancher). Leave empty for no accent.
+- **Flag:** Set `flag` to `yes` and put the badge text in `flag_label`. Set `flag` to `no` or leave empty for a solid border. Legacy rows with `baseline` / `optional` in `flag` still appear flagged until you save from the admin UI.
 
 - **New domain:** Add a new domain name in the **domain** column and use it for all rows that belong to that domain.
 
@@ -41,7 +42,7 @@
 
 | Column     | Required | Description |
 |-----------|----------|-------------|
-| release   | Yes      | Release name (e.g. R22, R1, R2). |
+| release   | Yes      | Release name (e.g. R22, R23, R24). |
 | start_date | Yes     | Start of release window. `YYYY-MM-DD`. |
 | end_date  | Yes      | End of release window. `YYYY-MM-DD`. |
 
@@ -50,8 +51,8 @@
 ```csv
 release,start_date,end_date
 R22,2025-12-01,2026-02-28
-R1,2026-03-01,2026-05-31
-R2,2026-06-01,2026-08-31
+R23,2026-03-01,2026-05-31
+R24,2026-06-01,2026-08-31
 ```
 
 To add a release: add a new row with **release**, **start_date**, and **end_date**.

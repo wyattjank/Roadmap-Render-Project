@@ -10,6 +10,14 @@ env/
 # roadmap.xlsx
 # roadmap.drawio
 
+# Node / React UI
+web/frontend/node_modules/
+web/static/dist/
+
+# Admin draft + version snapshots (local)
+roadmap.draft.csv
+history/
+
 # OS
 .DS_Store
 Thumbs.db

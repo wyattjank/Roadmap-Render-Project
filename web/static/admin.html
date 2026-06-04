@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Roadmap Admin</title>
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --panel: #fff;
+      --border: #ddd;
+      --today: #d32f2f;
+      --label-w: 280px;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; margin: 0; background: var(--bg); color: #1a1a1a; }
+    header {
+      background: #263238; color: #fff; padding: 12px 20px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    header h1 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+    header input { padding: 6px 10px; border-radius: 4px; border: none; min-width: 200px; }
+    header button {
+      padding: 6px 14px; border-radius: 4px; border: none; cursor: pointer;
+      background: #546e7a; color: #fff; font-size: 0.9rem;
+    }
+    header button.primary { background: #2e7d32; }
+    header button:disabled { opacity: 0.5; cursor: not-allowed; }
+    main { padding: 16px 20px; max-width: 100%; overflow-x: auto; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .panel h2 { margin: 0 0 12px; font-size: 1rem; }
+    .timeline-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 4px; }
+    .timeline {
+      display: grid;
+      grid-template-columns: var(--label-w) 1fr;
+      min-width: 900px;
+      position: relative;
+    }
+    .tl-header {
+      display: contents;
+    }
+    .tl-labels { grid-column: 1; background: #eee; font-size: 0.75rem; font-weight: 600; padding: 8px; border-bottom: 1px solid var(--border); }
+    .tl-months {
+      grid-column: 2; display: flex; background: #e5e5e5; border-bottom: 1px solid var(--border);
+      font-size: 0.65rem; position: relative; min-height: 28px;
+    }
+    .tl-month { flex: 1; text-align: center; padding: 4px 0; border-right: 1px solid #ccc; min-width: 0; }
+    .tl-today {
+      position: absolute; top: 0; bottom: 0; width: 2px; background: var(--today); z-index: 5; pointer-events: none;
+    }
+    .tl-row {
+      display: contents;
+    }
+    .tl-row-label {
+      grid-column: 1; padding: 6px 8px; font-size: 0.8rem; border-bottom: 1px solid #eee;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .tl-row-label .domain { font-weight: 600; font-size: 0.7rem; color: #555; }
+    .tl-row-bars {
+      grid-column: 2; position: relative; height: 32px; border-bottom: 1px solid #eee;
+    }
+    .bar {
+      position: absolute; top: 5px; height: 22px; border-radius: 4px;
+      font-size: 0.65rem; color: #fff; padding: 2px 6px; overflow: hidden;
+      white-space: nowrap; text-overflow: ellipsis; line-height: 18px;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    .bar.flag-baseline { border-left: 4px solid #2e7d32; }
+    .bar.flag-optional { border-left: 4px dashed #ef6c00; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+    th { background: #eee; }
+    td input, td select { width: 100%; padding: 4px; font-size: 0.85rem; }
+    .status { font-size: 0.85rem; color: #555; margin-top: 8px; }
+    .error { color: #c62828; }
+    .legend { display: flex; gap: 20px; font-size: 0.8rem; margin-bottom: 12px; flex-wrap: wrap; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .swatch { width: 12px; height: 12px; border-radius: 2px; }
+    .swatch.baseline { border-left: 4px solid #2e7d32; background: #ccc; }
+    .swatch.optional { border-left: 4px dashed #ef6c00; background: #fff3e0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Roadmap Admin</h1>
+    <input type="password" id="token" placeholder="Admin token (ROADMAP_ADMIN_TOKEN)" autocomplete="off" />
+    <button type="button" id="connect">Connect</button>
+    <button type="button" id="save" class="primary" disabled>Save roadmap</button>
+    <button type="button" id="export" disabled>Download Excel</button>
+    <button type="button" id="addRow" disabled>Add task</button>
+  </header>
+  <main>
+    <p class="status" id="status">Enter admin token and click Connect.</p>
+    <div class="panel" id="timelinePanel" hidden>
+      <h2>Timeline preview</h2>
+      <div class="legend">
+        <span><i class="swatch baseline"></i> Baseline (primary)</span>
+        <span><i class="swatch optional"></i> Optional</span>
+        <span style="color:var(--today)">| Today</span>
+      </div>
+      <div class="timeline-wrap">
+        <div class="timeline" id="timeline"></div>
+      </div>
+    </div>
+    <div class="panel" id="tablePanel" hidden>
+      <h2>Tasks (edit and Save)</h2>
+      <table id="taskTable">
+        <thead>
+          <tr>
+            <th>Domain</th><th>Feature</th><th>Task</th>
+            <th>Start</th><th>End</th><th>Notes</th><th>Flag</th><th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let tasks = [];
+    let timeline = null;
+
+    function token() {
+      return sessionStorage.getItem('roadmap_admin_token') || $('token').value.trim();
+    }
+
+    function authHeaders() {
+      const t = token();
+      if (!t) throw new Error('No admin token');
+      return { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' };
+    }
+
+    async function parseApiError(res) {
+      const text = await res.text();
+      let body = {};
+      if (text) {
+        try { body = JSON.parse(text); } catch {
+          return `HTTP ${res.status} ${res.statusText}${text ? ': ' + text.slice(0, 200) : ''}`;
+        }
+      }
+      const d = body.detail;
+      if (typeof d === 'string') return d;
+      if (Array.isArray(d)) return d.map(x => x.msg || JSON.stringify(x)).join('; ');
+      if (d != null) return JSON.stringify(d);
+      if (body.message) return body.message;
+      if (text && text.length < 300) return `HTTP ${res.status}: ${text}`;
+      return `HTTP ${res.status} ${res.statusText || 'request failed'}`;
+    }
+
+    function pct(dateStr, xStart, totalDays) {
+      const start = new Date(xStart);
+      const d = new Date(dateStr);
+      const days = (d - start) / (86400000);
+      return Math.max(0, Math.min(100, (days / totalDays) * 100));
+    }
+
+    function renderTimeline(data) {
+      timeline = data;
+      const el = $('timeline');
+      const n = data.months.length;
+      const monthPct = 100 / n;
+      let todayLeft = null;
+      if (data.today >= data.x_start && data.today <= data.x_end) {
+        todayLeft = pct(data.today, data.x_start, data.total_days);
+      }
+
+      let html = '<div class="tl-header"><div class="tl-labels">Domain / Feature / Task</div>';
+      html += '<div class="tl-months" style="--n:' + n + '">';
+      if (todayLeft != null) html += '<div class="tl-today" style="left:' + todayLeft + '%"></div>';
+      data.months.forEach(m => {
+        html += '<div class="tl-month" style="flex:1">' + m.label + '</div>';
+      });
+      html += '</div></div>';
+
+      data.tasks.forEach(t => {
+        const left = pct(t.start, data.x_start, data.total_days);
+        const right = pct(t.end, data.x_start, data.total_days);
+        const w = Math.max(0.5, right - left);
+        const flagCls = t.flag === 'baseline' ? ' flag-baseline' : (t.flag === 'optional' ? ' flag-optional' : '');
+        html += '<div class="tl-row">';
+        html += '<div class="tl-row-label"><span class="domain">' + esc(t.domain) + '</span>';
+        html += '<span>' + esc(t.feature) + ' — ' + esc(t.task) + '</span></div>';
+        html += '<div class="tl-row-bars">';
+        html += '<div class="bar' + flagCls + '" style="left:' + left + '%;width:' + w + '%;background:' + t.color + '" title="' + esc(t.task) + '">';
+        html += esc(t.task) + '</div></div></div>';
+      });
+      el.innerHTML = html;
+      $('timelinePanel').hidden = false;
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s || '';
+      return d.innerHTML;
+    }
+
+    function renderTable() {
+      const tbody = $('taskTable').querySelector('tbody');
+      tbody.innerHTML = '';
+      tasks.forEach((t, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input data-f="domain" data-i="${i}" value="${escAttr(t.domain)}" /></td>
+          <td><input data-f="feature" data-i="${i}" value="${escAttr(t.feature)}" /></td>
+          <td><input data-f="task" data-i="${i}" value="${escAttr(t.task)}" /></td>
+          <td><input data-f="start_date" data-i="${i}" type="date" value="${escAttr(t.start_date)}" /></td>
+          <td><input data-f="end_date" data-i="${i}" type="date" value="${escAttr(t.end_date)}" /></td>
+          <td><input data-f="notes" data-i="${i}" value="${escAttr(t.notes)}" /></td>
+          <td><select data-f="flag" data-i="${i}">
+            <option value="" ${!t.flag ? 'selected' : ''}>—</option>
+            <option value="baseline" ${t.flag==='baseline'?'selected':''}>baseline</option>
+            <option value="optional" ${t.flag==='optional'?'selected':''}>optional</option>
+          </select></td>
+          <td><button type="button" data-del="${i}">Delete</button></td>`;
+        tbody.appendChild(tr);
+      });
+      tbody.querySelectorAll('input, select').forEach(inp => {
+        inp.addEventListener('change', () => {
+          const i = +inp.dataset.i;
+          const f = inp.dataset.f;
+          tasks[i][f] = inp.value;
+        });
+      });
+      tbody.querySelectorAll('[data-del]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          tasks.splice(+btn.dataset.del, 1);
+          renderTable();
+        });
+      });
+      $('tablePanel').hidden = false;
+    }
+
+    function escAttr(s) {
+      return String(s || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    }
+
+    function collectTasksFromTable() {
+      const tbody = $('taskTable').querySelector('tbody');
+      tbody.querySelectorAll('tr').forEach((tr, i) => {
+        tr.querySelectorAll('[data-f]').forEach(inp => {
+          tasks[i][inp.dataset.f] = inp.value;
+        });
+      });
+      return tasks.map(t => ({
+        domain: t.domain || '',
+        feature: t.feature || '',
+        task: t.task || '',
+        start_date: t.start_date || '',
+        end_date: t.end_date || '',
+        notes: t.notes || '',
+        flag: t.flag || '',
+      }));
+    }
+
+    async function connect() {
+      const t = $('token').value.trim();
+      if (!t) { $('status').textContent = 'Enter a token.'; $('status').className = 'status error'; return; }
+      sessionStorage.setItem('roadmap_admin_token', t);
+      $('status').textContent = 'Loading…';
+      try {
+        const [tlRes, rmRes] = await Promise.all([
+          fetch('/api/timeline', { headers: authHeaders() }),
+          fetch('/api/roadmap', { headers: authHeaders() }),
+        ]);
+        if (!tlRes.ok || !rmRes.ok) {
+          const bad = !tlRes.ok ? tlRes : rmRes;
+          throw new Error(await parseApiError(bad));
+        }
+        timeline = await tlRes.json();
+        const rm = await rmRes.json();
+        tasks = rm.tasks;
+        renderTimeline(timeline);
+        renderTable();
+        $('save').disabled = false;
+        $('export').disabled = false;
+        $('addRow').disabled = false;
+        $('status').textContent = 'Connected. ' + tasks.length + ' tasks loaded.';
+        $('status').className = 'status';
+      } catch (e) {
+        $('status').textContent = 'Error: ' + e.message;
+        $('status').className = 'status error';
+      }
+    }
+
+    $('connect').addEventListener('click', connect);
+    $('token').addEventListener('keydown', e => { if (e.key === 'Enter') connect(); });
+    const q = new URLSearchParams(location.search).get('token');
+    if (q) { $('token').value = q; connect(); }
+
+    $('save').addEventListener('click', async () => {
+      const payload = { tasks: collectTasksFromTable() };
+      $('status').textContent = 'Saving…';
+      try {
+        const res = await fetch('/api/roadmap', { method: 'PUT', headers: authHeaders(), body: JSON.stringify(payload) });
+        if (!res.ok) throw new Error(await parseApiError(res));
+        const data = await res.json();
+        timeline = data.timeline;
+        tasks = payload.tasks;
+        renderTimeline(timeline);
+        renderTable();
+        $('status').textContent = 'Saved ' + data.saved + ' tasks.';
+        $('status').className = 'status';
+      } catch (e) {
+        $('status').textContent = 'Save failed: ' + e.message;
+        $('status').className = 'status error';
+      }
+    });
+
+    $('export').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/export/excel', { method: 'POST', headers: authHeaders() });
+        if (!res.ok) throw new Error(await parseApiError(res));
+        const blob = await res.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'roadmap.xlsx';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      } catch (e) {
+        $('status').textContent = 'Export failed: ' + e.message;
+        $('status').className = 'status error';
+      }
+    });
+
+    $('addRow').addEventListener('click', () => {
+      tasks.push({
+        domain: '', feature: '', task: 'New task',
+        start_date: timeline?.x_start?.slice(0, 10) || '2026-01-01',
+        end_date: timeline?.x_end?.slice(0, 10) || '2026-06-30',
+        notes: '', flag: '',
+      });
+      renderTable();
+    });
+  </script>
+</body>
+</html>

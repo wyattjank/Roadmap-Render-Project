@@ -10,10 +10,21 @@ from xml.etree import ElementTree as ET
 import argparse
 
 # Roadmap CSV: one row per TASK. Columns: domain, feature, task, start_date, end_date, notes (optional), flag (optional).
-# flag: "baseline" | "optional" | empty → visual accent on task bar (e.g. EKS=baseline, Rancher=optional).
+# flag: "yes" | "no" | empty; flag_label: text when flag=yes. Legacy: baseline | optional.
 # Legacy: domain, subdomain, feature, ... treated as feature=subdomain, task=feature (one bar per row).
 RELEASES_COLUMNS = ["release", "start", "end"]
-FLAG_VALUES = ("baseline", "optional")  # empty/null = no flag
+FLAG_VALUES = ("baseline", "optional", "yes", "no")  # empty/null = no flag
+
+
+def _flag_left_accent(flag, baseline_side, optional_side):
+    """Excel/draw.io left accent from flag column (legacy baseline/optional + yes)."""
+    f = (flag or "").strip().lower()
+    if f == "baseline":
+        return baseline_side
+    if f in ("optional", "yes"):
+        return optional_side
+    return None
+
 
 X_START = "2025-12-01"
 X_END = "2027-12-31"
@@ -378,7 +389,7 @@ def export_to_excel(roadmap: pd.DataFrame, releases: pd.DataFrame, path: Path) -
                 ws_vis.cell(row_idx, col).border = no_border
         # Task bar cells: no border inside the bar; only the leftmost cell gets flag accent; separator rows get bottom only
         flag = r.get("flag") or ""
-        left_side = flag_baseline_left if flag == "baseline" else (flag_optional_left if flag == "optional" else None)
+        left_side = _flag_left_accent(flag, flag_baseline_left, flag_optional_left)
         bottom_side = bold_bottom if is_last_of_domain[idx] else (thin_bottom if is_last_of_feature[idx] else None)
         color = feature_to_color.get((domain_name, feature_name), "CCCCCC")
         fill_hex = color.lstrip("#")[:6]
@@ -405,7 +416,7 @@ def export_to_excel(roadmap: pd.DataFrame, releases: pd.DataFrame, path: Path) -
     for idx in range(len(flat_rows)):
         _, _, row_dict = flat_rows[idx]
         flag = row_dict.get("flag") or ""
-        left_side = flag_baseline_left if flag == "baseline" else (flag_optional_left if flag == "optional" else None)
+        left_side = _flag_left_accent(flag, flag_baseline_left, flag_optional_left)
         bottom_side = bold_bottom if is_last_of_domain[idx] else (thin_bottom if is_last_of_feature[idx] else None)
         start_ts = pd.Timestamp(row_dict["start"])
         end_ts = pd.Timestamp(row_dict["end"])
@@ -727,7 +738,7 @@ def export_to_drawio(roadmap: pd.DataFrame, releases: pd.DataFrame, path: Path) 
             font_size = 8
         flag = r.get("flag") or ""
         stroke_style = "strokeColor=#333333;"
-        if flag == "optional":
+        if flag in ("optional", "yes"):
             stroke_style = "strokeColor=#EF6C00;dashPattern=1 2 1 2;"
         style = f"rounded=1;whiteSpace=wrap;fillColor={color};{stroke_style}fontColor=#ffffff;fontSize={font_size};align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;"
         add_cell("1", cell_id, label, style, x, y + (row_height - bar_h) / 2, bar_w, bar_h)

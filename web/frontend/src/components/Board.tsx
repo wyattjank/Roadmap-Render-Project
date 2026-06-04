@@ -18,7 +18,8 @@ import type { Feature, Objective, TagColorId } from '../lib/roadmap-data';
 
 import type { TimelinePayload } from '../lib/types';
 
-import { MONTH_COLUMN_WIDTH, ReleaseTimelineHeader } from './ReleaseTimelineHeader';
+import { MONTH_COLUMN_WIDTH } from '../lib/releases';
+import { ReleaseTimelineHeader } from './ReleaseTimelineHeader';
 
 import { ObjectiveSection } from './ObjectiveSection';
 
@@ -126,9 +127,7 @@ export function Board({
 
 
 
-  const colWidth = (col: ReleaseColumn) =>
-
-    Math.max(col.monthSpan * MONTH_COLUMN_WIDTH - 8, 140);
+  const colWidth = (col: ReleaseColumn) => col.monthSpan * MONTH_COLUMN_WIDTH - 8;
 
 
 
@@ -198,8 +197,6 @@ export function Board({
 
               releaseColumns={releaseColumns}
 
-              gridTemplateColumns={gridTemplateColumns}
-
               today={timeline.today}
 
             />
@@ -208,7 +205,7 @@ export function Board({
 
 
 
-          <div className="px-2 pb-8 pt-3">
+          <div className="board-body-gutter pr-2 pb-8 pt-3 pl-8">
 
             {visibleObjectives.map((obj) => (
 

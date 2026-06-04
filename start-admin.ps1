@@ -29,7 +29,7 @@ if (Test-Path $distIndex) {
     npm run build
     Pop-Location
 } elseif (-not $npm) {
-    Write-Host "Note: npm not found and no web\static\dist — see docs\WORK-SETUP.md"
+    Write-Host "Note: npm not found and no web\static\dist - see docs\WORK-SETUP.md"
     Write-Host "       Server will use legacy admin.html until UI is built or dist is copied in."
 }
 

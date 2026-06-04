@@ -139,3 +139,12 @@ body {
   isolation: isolate;
   box-shadow: 0 1px 0 var(--app-border);
 }
+
+.board-body-gutter {
+  padding-left: 32px;
+}
+
+.app-navbar {
+  background: var(--app-header);
+  border-color: var(--app-border);
+}

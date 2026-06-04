@@ -1,5 +1,7 @@
 import type { TimelineMonth, TimelineRelease } from './types';
 
+export const MONTH_COLUMN_WIDTH = 72;
+
 export interface MonthCell {
   date: string;
   label: string;
@@ -116,6 +118,27 @@ export function releaseGridTemplateColumns(
   colWidth: (col: ReleaseColumn) => number,
 ): string {
   return releaseColumns.map((c) => `${colWidth(c)}px`).join(' ');
+}
+
+/** Month-index span for a release label (aligns R22/R23 row with month columns). */
+export function releaseMonthGridPlacement(
+  monthCells: MonthCell[],
+  releaseId: string,
+): { colStart: number; colSpan: number } {
+  let first = -1;
+  let last = -1;
+  monthCells.forEach((c, i) => {
+    if (c.release === releaseId) {
+      if (first < 0) first = i;
+      last = i;
+    }
+  });
+  if (first < 0) return { colStart: 1, colSpan: 1 };
+  return { colStart: first + 1, colSpan: last - first + 1 };
+}
+
+export function monthGridTemplateColumns(monthCount: number, gutterPx = 32, monthPx = 72): string {
+  return `${gutterPx}px repeat(${monthCount}, ${monthPx}px)`;
 }
 
 /** Grid placement: one bar from first to last overlapping release column. */

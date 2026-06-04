@@ -16,7 +16,10 @@ if ($on8080) {
 
 $frontend = Join-Path $PSScriptRoot "web\frontend"
 $npm = Get-Command npm -ErrorAction SilentlyContinue
-if ($npm -and (Test-Path (Join-Path $frontend "package.json"))) {
+$distIndex = Join-Path $PSScriptRoot "web\static\dist\index.html"
+if (Test-Path $distIndex) {
+    Write-Host "Using existing UI build (web\static\dist)."
+} elseif ($npm -and (Test-Path (Join-Path $frontend "package.json"))) {
     Push-Location $frontend
     if (-not (Test-Path "node_modules")) {
         Write-Host "Installing UI dependencies (first time)..."
@@ -26,8 +29,8 @@ if ($npm -and (Test-Path (Join-Path $frontend "package.json"))) {
     npm run build
     Pop-Location
 } elseif (-not $npm) {
-    Write-Host "Note: npm not found — install Node.js from https://nodejs.org for the interactive UI."
-    Write-Host "       Server will use legacy admin.html until you run: cd web\frontend; npm install; npm run build"
+    Write-Host "Note: npm not found and no web\static\dist — see docs\WORK-SETUP.md"
+    Write-Host "       Server will use legacy admin.html until UI is built or dist is copied in."
 }
 
 $url = "http://127.0.0.1:8080/?token=dev-admin"

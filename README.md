@@ -43,6 +43,8 @@ npm run build    # output → web/static/dist
 
 Open: `http://127.0.0.1:8080/?token=dev-admin`
 
+**Work machine / corporate firewall:** see **[docs/WORK-SETUP.md](docs/WORK-SETUP.md)** (git pull in Cursor, pip/npm proxy, pre-built UI).
+
 ## Data files
 
 | File | Role |

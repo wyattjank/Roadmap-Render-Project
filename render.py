@@ -16,9 +16,18 @@ RELEASES_COLUMNS = ["release", "start", "end"]
 FLAG_VALUES = ("baseline", "optional", "yes", "no")  # empty/null = no flag
 
 
+def _normalize_flag_cell(flag) -> str:
+    """Coerce CSV/pandas flag values (including NaN) to a lowercase string."""
+    if flag is None:
+        return ""
+    if isinstance(flag, float) and pd.isna(flag):
+        return ""
+    return str(flag).strip().lower()
+
+
 def _flag_left_accent(flag, baseline_side, optional_side):
     """Excel/draw.io left accent from flag column (legacy baseline/optional + yes)."""
-    f = (flag or "").strip().lower()
+    f = _normalize_flag_cell(flag)
     if f == "baseline":
         return baseline_side
     if f in ("optional", "yes"):
@@ -208,10 +217,16 @@ def _prepare_roadmap(roadmap: pd.DataFrame) -> pd.DataFrame:
     has_task = "task" in df.columns and df["task"].astype(str).str.strip().str.len().gt(0).any()
     if has_task:
         df["row_feature"] = df["feature"]
-        df["task_label"] = df["task"].astype(str).str.strip().replace("", pd.NA).fillna(df["feature"])
+        # Use mask to convert empty strings to NaN, then fillna
+        task_stripped = df["task"].astype(str).str.strip()
+        df["task_label"] = task_stripped.mask(task_stripped == "").fillna(df["feature"])
     else:
         # Legacy: subdomain = row, feature = single task
-        df["row_feature"] = df.get("subdomain", "").replace("", pd.NA).fillna(df["domain"])
+        subdomain_col = df.get("subdomain", pd.Series(dtype=str))
+        if isinstance(subdomain_col, pd.Series):
+            df["row_feature"] = subdomain_col.mask(subdomain_col == "").fillna(df["domain"])
+        else:
+            df["row_feature"] = df["domain"]
         df["task_label"] = df["feature"]
     df["row_feature"] = df["row_feature"].astype(str)
     df["task_label"] = df["task_label"].astype(str)

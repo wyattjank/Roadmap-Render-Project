@@ -16,6 +16,7 @@ ROADMAP_COLUMNS = [
     "notes",
     "flag",
     "flag_label",
+    "flag_color",
 ]
 RELEASE_COLUMNS = ["release", "start_date", "end_date"]
 
@@ -32,6 +33,7 @@ def roadmap_to_records(df: pd.DataFrame) -> list[dict]:
             "notes": _safe_cell(row.get("notes")),
             "flag": _safe_cell(row.get("flag")),
             "flag_label": _safe_cell(row.get("flag_label")),
+            "flag_color": _safe_cell(row.get("flag_color")),
         })
     return out
 

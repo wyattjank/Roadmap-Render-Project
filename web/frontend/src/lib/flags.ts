@@ -2,6 +2,30 @@
 
 export type FlagYesNo = 'yes' | 'no';
 
+export type FlagBorderColor = 'green' | 'yellow' | 'red';
+
+export const FLAG_BORDER_COLORS: Record<
+  FlagBorderColor,
+  { label: string; hex: string }
+> = {
+  green: { label: 'Green', hex: '#22C55E' },
+  yellow: { label: 'Yellow', hex: '#EAB308' },
+  red: { label: 'Red', hex: '#EF4444' },
+};
+
+export const DEFAULT_FLAG_BORDER_COLOR: FlagBorderColor = 'yellow';
+
+export function normalizeFlagColor(raw: string | undefined): FlagBorderColor {
+  const c = (raw || '').trim().toLowerCase();
+  if (c === 'green' || c === 'yellow' || c === 'red') return c;
+  return DEFAULT_FLAG_BORDER_COLOR;
+}
+
+export function flagBorderHex(color: FlagBorderColor | string | undefined): string {
+  const key = normalizeFlagColor(color);
+  return FLAG_BORDER_COLORS[key].hex;
+}
+
 export function normalizeFromCsv(
   flagRaw: string,
   flagLabelRaw?: string,
@@ -27,9 +51,14 @@ export function isFlagYes(flag: string): boolean {
 export function toCsvFlagFields(
   flag: string,
   flagLabel: string,
-): { flag: string; flag_label: string } {
-  if (!isFlagYes(flag)) return { flag: 'no', flag_label: '' };
-  return { flag: 'yes', flag_label: flagLabel.trim() };
+  flagColor?: string,
+): { flag: string; flag_label: string; flag_color: string } {
+  if (!isFlagYes(flag)) return { flag: 'no', flag_label: '', flag_color: '' };
+  return {
+    flag: 'yes',
+    flag_label: flagLabel.trim(),
+    flag_color: normalizeFlagColor(flagColor),
+  };
 }
 
 export const FLAG_YES_NO_OPTIONS: { value: FlagYesNo; label: string }[] = [

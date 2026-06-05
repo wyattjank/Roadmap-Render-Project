@@ -44,7 +44,7 @@ def ensure_draft_from_live(live: Path, draft: Path) -> None:
     else:
         draft.parent.mkdir(parents=True, exist_ok=True)
         draft.write_text(
-            "domain,feature,task,start_date,end_date,notes,flag,flag_label\n",
+            "domain,feature,task,start_date,end_date,notes,flag,flag_label,flag_color\n",
             encoding="utf-8",
         )
 

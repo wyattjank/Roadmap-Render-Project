@@ -1,6 +1,6 @@
 import { Trash2, X } from 'lucide-react';
 import { overlappingReleasesForTask, releaseById } from '../lib/releases';
-import { FLAG_YES_NO_OPTIONS, isFlagYes, type FlagYesNo } from '../lib/flags';
+import { FLAG_YES_NO_OPTIONS, FLAG_BORDER_COLORS, isFlagYes, type FlagYesNo, type FlagBorderColor } from '../lib/flags';
 import { TAG_COLORS, type Feature, type TagColorId } from '../lib/roadmap-data';
 import type { TimelinePayload } from '../lib/types';
 
@@ -78,7 +78,7 @@ export function FeatureDrawer({
                 label="Flag"
                 value={
                   isFlagYes(feature.flag)
-                    ? `Yes${feature.flagLabel ? ` · ${feature.flagLabel}` : ''}`
+                    ? `Yes${feature.flagLabel ? ` · ${feature.flagLabel}` : ''} · ${FLAG_BORDER_COLORS[feature.flagColor].label} border`
                     : 'No'
                 }
               />
@@ -163,9 +163,13 @@ export function FeatureDrawer({
             onChange={(e) => {
               const next = e.target.value as FlagYesNo;
               if (next === 'no') {
-                onUpdate({ flag: 'no', flagLabel: '' });
+                onUpdate({ flag: 'no', flagLabel: '', flagColor: 'yellow' });
               } else {
-                onUpdate({ flag: 'yes', flagLabel: feature.flagLabel });
+                onUpdate({
+                  flag: 'yes',
+                  flagLabel: feature.flagLabel,
+                  flagColor: feature.flagColor || 'yellow',
+                });
               }
             }}
           >
@@ -185,6 +189,30 @@ export function FeatureDrawer({
                 value={feature.flagLabel}
                 onChange={(e) => onUpdate({ flagLabel: e.target.value })}
               />
+
+              <label className="theme-label mb-2 block">Flag border color</label>
+              <div className="mb-4 flex flex-wrap gap-2">
+                {(Object.keys(FLAG_BORDER_COLORS) as FlagBorderColor[]).map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    title={FLAG_BORDER_COLORS[id].label}
+                    onClick={() => onUpdate({ flagColor: id })}
+                    className={`flex items-center gap-2 rounded-lg border-2 px-3 py-2 text-xs font-medium transition ${
+                      feature.flagColor === id
+                        ? 'border-[var(--app-text)]'
+                        : 'border-transparent'
+                    }`}
+                    style={{ color: 'var(--app-text)' }}
+                  >
+                    <span
+                      className="h-5 w-5 rounded-sm border-2 border-dashed"
+                      style={{ borderColor: FLAG_BORDER_COLORS[id].hex }}
+                    />
+                    {FLAG_BORDER_COLORS[id].label}
+                  </button>
+                ))}
+              </div>
             </>
           )}
 

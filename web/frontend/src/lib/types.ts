@@ -8,6 +8,7 @@ export interface TimelineTask {
   notes: string;
   flag: string;
   flag_label: string;
+  flag_color: string;
   color: string;
 }
 
@@ -44,4 +45,5 @@ export interface RoadmapCsvRow {
   notes: string;
   flag: string;
   flag_label: string;
+  flag_color: string;
 }

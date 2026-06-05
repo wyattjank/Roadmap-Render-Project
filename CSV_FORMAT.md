@@ -18,6 +18,7 @@
 | notes      | No       | Free text. |
 | flag       | No       | `yes` or `no` (empty = no). `yes` = dashed border / talking point in the admin UI. Legacy `baseline` / `optional` still load as flagged. |
 | flag_label | No       | Text shown on the card when `flag` is `yes` (e.g. At Risk, Customer Dependent, BLOCKED/DELAYED). |
+| flag_color | No       | When `flag` is `yes`: `green`, `yellow`, or `red` for the dashed border (default `yellow`). |
 
 **Examples**
 

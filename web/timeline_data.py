@@ -62,6 +62,7 @@ def build_timeline_payload(roadmap, releases) -> dict:
                 "notes": _safe_str(r.get("notes")),
                 "flag": _safe_str(r.get("flag")),
                 "flag_label": _safe_str(r.get("flag_label")),
+                "flag_color": _safe_str(r.get("flag_color")),
                 "color": color,
             })
             idx += 1

@@ -14,6 +14,12 @@ import argparse
 # Legacy: domain, subdomain, feature, ... treated as feature=subdomain, task=feature (one bar per row).
 RELEASES_COLUMNS = ["release", "start", "end"]
 FLAG_VALUES = ("baseline", "optional", "yes", "no")  # empty/null = no flag
+FLAG_BORDER_HEX = {
+    "green": "22C55E",
+    "yellow": "EAB308",
+    "red": "EF4444",
+}
+DEFAULT_FLAG_BORDER = "yellow"
 
 
 def _normalize_flag_cell(flag) -> str:
@@ -25,14 +31,31 @@ def _normalize_flag_cell(flag) -> str:
     return str(flag).strip().lower()
 
 
-def _flag_left_accent(flag, baseline_side, optional_side):
+def _normalize_flag_color(flag_color) -> str:
+    """UI flag border color: green | yellow | red."""
+    c = _normalize_flag_cell(flag_color)
+    if c in FLAG_BORDER_HEX:
+        return c
+    return DEFAULT_FLAG_BORDER
+
+
+def _flag_left_accent(flag, flag_color, baseline_side, optional_side):
     """Excel/draw.io left accent from flag column (legacy baseline/optional + yes)."""
     f = _normalize_flag_cell(flag)
     if f == "baseline":
         return baseline_side
-    if f in ("optional", "yes"):
+    if f == "optional":
         return optional_side
+    if f == "yes":
+        from openpyxl.styles import Side
+
+        hex_color = FLAG_BORDER_HEX[_normalize_flag_color(flag_color)]
+        return Side(style="mediumDashed", color=hex_color)
     return None
+
+
+def _flag_yes_stroke_hex(flag_color) -> str:
+    return f"#{FLAG_BORDER_HEX[_normalize_flag_color(flag_color)]}"
 
 
 X_START = "2025-12-01"
@@ -404,7 +427,8 @@ def export_to_excel(roadmap: pd.DataFrame, releases: pd.DataFrame, path: Path) -
                 ws_vis.cell(row_idx, col).border = no_border
         # Task bar cells: no border inside the bar; only the leftmost cell gets flag accent; separator rows get bottom only
         flag = r.get("flag") or ""
-        left_side = _flag_left_accent(flag, flag_baseline_left, flag_optional_left)
+        flag_color = r.get("flag_color")
+        left_side = _flag_left_accent(flag, flag_color, flag_baseline_left, flag_optional_left)
         bottom_side = bold_bottom if is_last_of_domain[idx] else (thin_bottom if is_last_of_feature[idx] else None)
         color = feature_to_color.get((domain_name, feature_name), "CCCCCC")
         fill_hex = color.lstrip("#")[:6]
@@ -431,7 +455,8 @@ def export_to_excel(roadmap: pd.DataFrame, releases: pd.DataFrame, path: Path) -
     for idx in range(len(flat_rows)):
         _, _, row_dict = flat_rows[idx]
         flag = row_dict.get("flag") or ""
-        left_side = _flag_left_accent(flag, flag_baseline_left, flag_optional_left)
+        flag_color = row_dict.get("flag_color")
+        left_side = _flag_left_accent(flag, flag_color, flag_baseline_left, flag_optional_left)
         bottom_side = bold_bottom if is_last_of_domain[idx] else (thin_bottom if is_last_of_feature[idx] else None)
         start_ts = pd.Timestamp(row_dict["start"])
         end_ts = pd.Timestamp(row_dict["end"])
@@ -753,8 +778,10 @@ def export_to_drawio(roadmap: pd.DataFrame, releases: pd.DataFrame, path: Path) 
             font_size = 8
         flag = r.get("flag") or ""
         stroke_style = "strokeColor=#333333;"
-        if flag in ("optional", "yes"):
+        if flag == "optional":
             stroke_style = "strokeColor=#EF6C00;dashPattern=1 2 1 2;"
+        elif flag == "yes":
+            stroke_style = f"strokeColor={_flag_yes_stroke_hex(r.get('flag_color'))};dashPattern=1 2 1 2;"
         style = f"rounded=1;whiteSpace=wrap;fillColor={color};{stroke_style}fontColor=#ffffff;fontSize={font_size};align=left;verticalAlign=middle;spacingLeft=3;spacingRight=2;overflow=hidden;"
         add_cell("1", cell_id, label, style, x, y + (row_height - bar_h) / 2, bar_w, bar_h)
         cell_id += 1

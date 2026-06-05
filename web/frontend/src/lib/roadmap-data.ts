@@ -1,4 +1,5 @@
 import type { TimelinePayload } from './types';
+import type { FlagBorderColor } from './flags';
 
 export type TagColorId = 'green' | 'orange' | 'purple' | 'teal' | 'yellow' | 'blue';
 
@@ -28,6 +29,8 @@ export interface Feature {
   flag: string;
   /** Shown on card when flag is yes (e.g. At Risk, BLOCKED/DELAYED) */
   flagLabel: string;
+  /** Dashed border color when flag is yes */
+  flagColor: FlagBorderColor;
   votes: number;
 }
 

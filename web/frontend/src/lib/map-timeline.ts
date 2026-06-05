@@ -1,7 +1,7 @@
 import { primaryReleaseForTask } from './releases';
 import type { RoadmapCsvRow, TimelinePayload } from './types';
 import type { Feature, Objective, RoadmapState, TagColorId } from './roadmap-data';
-import { normalizeFromCsv, toCsvFlagFields } from './flags';
+import { normalizeFromCsv, normalizeFlagColor, toCsvFlagFields } from './flags';
 import { uid } from './roadmap-data';
 
 const TAG_CYCLE: TagColorId[] = ['blue', 'teal', 'green', 'orange', 'yellow', 'purple'];
@@ -49,6 +49,7 @@ export function timelineToState(tl: TimelinePayload): RoadmapState {
       endDate: t.end || '',
       flag,
       flagLabel,
+      flagColor: normalizeFlagColor(t.flag_color),
       votes: 0,
     });
   }
@@ -67,7 +68,7 @@ export function timelineToState(tl: TimelinePayload): RoadmapState {
 export function stateToCsvRows(state: RoadmapState): RoadmapCsvRow[] {
   return state.features.map((f) => {
     const objective = state.objectives.find((o) => o.id === f.objectiveId);
-    const csvFlag = toCsvFlagFields(f.flag, f.flagLabel);
+    const csvFlag = toCsvFlagFields(f.flag, f.flagLabel, f.flagColor);
     return {
       domain: objective?.title ?? '',
       feature: f.featureGroup || f.title,
@@ -77,6 +78,7 @@ export function stateToCsvRows(state: RoadmapState): RoadmapCsvRow[] {
       notes: f.description,
       flag: csvFlag.flag,
       flag_label: csvFlag.flag_label,
+      flag_color: csvFlag.flag_color,
     };
   });
 }
@@ -104,6 +106,7 @@ export function newFeatureFromRelease(
     endDate: rel?.end ?? '',
     flag: 'no',
     flagLabel: '',
+    flagColor: 'yellow',
     votes: 0,
   };
 }

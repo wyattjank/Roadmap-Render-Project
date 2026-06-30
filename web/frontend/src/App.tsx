@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Board } from './components/Board';
 import { FeatureDrawer } from './components/FeatureDrawer';
+import { LifecycleRoadmap } from './components/LifecycleRoadmap';
 import { Navbar } from './components/Navbar';
 import { Sidebar, type ViewMode } from './components/Sidebar';
 import { VersionsPanel } from './components/VersionsPanel';
@@ -33,6 +34,9 @@ export default function App() {
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(null);
   const [versionsOpen, setVersionsOpen] = useState(false);
+  const [lifecycleSaveSignal, setLifecycleSaveSignal] = useState(0);
+  const [lifecyclePublishSignal, setLifecyclePublishSignal] = useState(0);
+  const [lifecycleReloadSignal, setLifecycleReloadSignal] = useState(0);
   const [byObjectives, setByObjectives] = useState(true);
   const [search, setSearch] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -57,6 +61,7 @@ export default function App() {
   }, []);
 
   const readOnly = viewMode === 'readonly';
+  const isLifecycle = viewMode === 'lifecycle';
   const dataSource: DataSource = readOnly ? 'live' : 'draft';
 
   const loadTimeline = useCallback(
@@ -104,6 +109,7 @@ export default function App() {
   const handleModeChange = (mode: ViewMode) => {
     setViewMode(mode);
     setSelectedFeatureId(null);
+    if (mode === 'lifecycle') return;
     void loadTimeline(mode === 'readonly' ? 'live' : 'draft');
   };
 
@@ -235,6 +241,10 @@ export default function App() {
   );
 
   const handleSave = async () => {
+    if (isLifecycle) {
+      setLifecycleSaveSignal((n) => n + 1);
+      return;
+    }
     if (!state || readOnly) return;
     setBusy(true);
     setStatus('Saving draft…');
@@ -254,6 +264,11 @@ export default function App() {
   };
 
   const handlePublish = async () => {
+    if (isLifecycle) {
+      if (!window.confirm('Publish lifecycle draft to live?')) return;
+      setLifecyclePublishSignal((n) => n + 1);
+      return;
+    }
     if (!state || readOnly) return;
     if (!window.confirm('Publish draft to live? Customers/read-only view will see this.')) {
       return;
@@ -304,9 +319,12 @@ export default function App() {
   return (
     <div className="theme-surface flex h-full flex-col overflow-hidden">
       <Navbar
-        appTitle={state?.appTitle ?? 'Roadmap'}
+        appTitle={isLifecycle ? 'Software Lifecycle' : (state?.appTitle ?? 'Roadmap')}
         onTitleChange={(appTitle) => state && setState({ ...state, appTitle })}
         readOnly={readOnly}
+        titleReadOnly={readOnly || isLifecycle}
+        showRoadmapControls={!isLifecycle}
+        showAdminActions={!readOnly}
         byObjectives={byObjectives}
         onToggleByObjectives={() => setByObjectives((v) => !v)}
         search={search}
@@ -339,7 +357,7 @@ export default function App() {
         onVersions={() => setVersionsOpen(true)}
         onExport={handleExport}
         busy={busy}
-        canSave={!!state}
+        canSave={isLifecycle || !!state}
         status={status}
         tokenInput={tokenInput}
         onTokenChange={setTokenInput}
@@ -352,7 +370,19 @@ export default function App() {
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <main className="theme-surface flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-            {!state ? (
+            {isLifecycle ? (
+              <LifecycleRoadmap
+                readOnly={false}
+                dataSource="draft"
+                onStatus={setStatus}
+                onBusy={setBusy}
+                saveSignal={lifecycleSaveSignal}
+                publishSignal={lifecyclePublishSignal}
+                onSaved={() => setLifecycleReloadSignal((n) => n + 1)}
+                onPublished={() => setLifecycleReloadSignal((n) => n + 1)}
+                key={lifecycleReloadSignal}
+              />
+            ) : !state ? (
               <div
                 className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center text-sm"
                 style={{ color: 'var(--app-text-muted)' }}
@@ -422,7 +452,14 @@ export default function App() {
       <VersionsPanel
         open={versionsOpen}
         onClose={() => setVersionsOpen(false)}
-        onRestored={() => void loadTimeline('draft')}
+        kind={isLifecycle ? 'lifecycle' : 'roadmap'}
+        onRestored={() => {
+          if (isLifecycle) {
+            setLifecycleReloadSignal((n) => n + 1);
+          } else {
+            void loadTimeline('draft');
+          }
+        }}
       />
     </div>
   );

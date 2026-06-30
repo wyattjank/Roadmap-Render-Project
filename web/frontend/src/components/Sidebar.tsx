@@ -1,6 +1,6 @@
-import { Eye, Pencil } from 'lucide-react';
+import { Eye, Layers, Pencil } from 'lucide-react';
 
-export type ViewMode = 'edit' | 'readonly';
+export type ViewMode = 'edit' | 'readonly' | 'lifecycle';
 
 interface Props {
   mode: ViewMode;
@@ -10,6 +10,12 @@ interface Props {
 const MODES: { id: ViewMode; icon: typeof Pencil; label: string; hint: string }[] = [
   { id: 'edit', icon: Pencil, label: 'Edit', hint: 'Edit draft — add, delete, save, publish' },
   { id: 'readonly', icon: Eye, label: 'Standard view', hint: 'Published live roadmap (read-only)' },
+  {
+    id: 'lifecycle',
+    icon: Layers,
+    label: 'Lifecycle',
+    hint: 'Software lifecycle — versions, EOL dates, support windows',
+  },
 ];
 
 export function Sidebar({ mode, onModeChange }: Props) {
@@ -39,7 +45,7 @@ export function Sidebar({ mode, onModeChange }: Props) {
             )}
             <Icon className="h-5 w-5" strokeWidth={1.75} />
             <span className="mt-0.5 text-[8px] font-semibold uppercase leading-none tracking-tight">
-              {id === 'edit' ? 'Edit' : 'View'}
+              {id === 'edit' ? 'Edit' : id === 'readonly' ? 'View' : 'Life'}
             </span>
           </button>
         );

@@ -12,6 +12,18 @@ export interface VersionEntry {
   label: string;
   actor: string;
   task_count: number;
+  source?: 'draft' | 'live';
+  domains_filename?: string;
+}
+
+export interface LifecycleEntry {
+  id: string;
+  software: string;
+  version: string;
+  status: 'active' | 'eol' | 'planned' | 'deprecated';
+  eol_date: string | null;
+  active_until: string | null;
+  notes: string;
 }
 
 export function getToken(): string {
@@ -126,6 +138,61 @@ export async function restoreVersion(versionId: string) {
   });
   if (!res.ok) throw new Error(await parseError(res));
   return res.json() as Promise<{ timeline: TimelinePayload; restored: string }>;
+}
+
+export async function fetchLifecycle(source: DataSource = 'draft') {
+  const res = await fetchWithTimeout(`/api/lifecycle?source=${source}`, {
+    headers: headers(getToken()),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{ entries: LifecycleEntry[]; source: DataSource }>;
+}
+
+export async function saveLifecycle(
+  entries: LifecycleEntry[],
+  snapshotLabel?: string,
+) {
+  const res = await fetchWithTimeout('/api/lifecycle', {
+    method: 'PUT',
+    headers: headers(getToken()),
+    body: JSON.stringify({ entries, snapshot_label: snapshotLabel }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{
+    saved: number;
+    entries: LifecycleEntry[];
+    version: VersionEntry;
+  }>;
+}
+
+export async function publishLifecycle() {
+  const res = await fetchWithTimeout('/api/lifecycle/publish', {
+    method: 'POST',
+    headers: headers(getToken()),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{
+    published: boolean;
+    entries: LifecycleEntry[];
+    version: VersionEntry;
+  }>;
+}
+
+export async function fetchLifecycleVersions() {
+  const res = await fetchWithTimeout('/api/lifecycle/versions', {
+    headers: headers(getToken()),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{ versions: VersionEntry[] }>;
+}
+
+export async function restoreLifecycleVersion(versionId: string) {
+  const res = await fetchWithTimeout(`/api/lifecycle/versions/${versionId}/restore`, {
+    method: 'POST',
+    headers: headers(getToken()),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{ entries: LifecycleEntry[]; restored: string }>;
 }
 
 export async function exportExcel(source: DataSource = 'live'): Promise<Blob> {

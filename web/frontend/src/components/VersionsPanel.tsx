@@ -1,36 +1,74 @@
 import { History, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { fetchVersions, restoreVersion, type VersionEntry } from '../lib/api';
+import {
+  fetchLifecycleVersions,
+  fetchVersions,
+  restoreLifecycleVersion,
+  restoreVersion,
+  type VersionEntry,
+} from '../lib/api';
+
+type HistoryKind = 'roadmap' | 'lifecycle';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   onRestored: () => void;
+  kind?: HistoryKind;
 }
 
-export function VersionsPanel({ open, onClose, onRestored }: Props) {
+function sourceBadge(source?: string, label?: string) {
+  const isLive =
+    source === 'live' ||
+    (label?.toLowerCase().includes('publish') && !label?.toLowerCase().includes('pre-publish'));
+  if (isLive) {
+    return (
+      <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-emerald-700 dark:text-emerald-300">
+        Published
+      </span>
+    );
+  }
+  return (
+    <span className="rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-blue-700 dark:text-blue-300">
+      Draft
+    </span>
+  );
+}
+
+export function VersionsPanel({ open, onClose, onRestored, kind = 'roadmap' }: Props) {
   const [versions, setVersions] = useState<VersionEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
 
+  const title = kind === 'lifecycle' ? 'Lifecycle version history' : 'Roadmap version history';
+
   useEffect(() => {
     if (!open) return;
     setLoading(true);
     setError('');
-    fetchVersions()
+    const fetcher = kind === 'lifecycle' ? fetchLifecycleVersions : fetchVersions;
+    fetcher()
       .then((r) => setVersions(r.versions))
       .catch((e) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false));
-  }, [open]);
+  }, [open, kind]);
 
   const handleRestore = async (id: string) => {
-    if (!window.confirm(`Restore draft from version ${id}? Current draft will be snapshotted first.`)) {
+    if (
+      !window.confirm(
+        `Restore draft from version ${id}? Current draft will be snapshotted first.`,
+      )
+    ) {
       return;
     }
     setBusyId(id);
     try {
-      await restoreVersion(id);
+      if (kind === 'lifecycle') {
+        await restoreLifecycleVersion(id);
+      } else {
+        await restoreVersion(id);
+      }
       onRestored();
       onClose();
     } catch (e) {
@@ -52,7 +90,7 @@ export function VersionsPanel({ open, onClose, onRestored }: Props) {
         >
           <div className="flex items-center gap-2">
             <History className="h-5 w-5" style={{ color: 'var(--app-accent)' }} />
-            <h2 className="text-sm font-semibold">Version history</h2>
+            <h2 className="text-sm font-semibold">{title}</h2>
           </div>
           <button type="button" onClick={onClose} className="theme-btn-ghost rounded-lg p-1.5">
             <X className="h-5 w-5" />
@@ -62,8 +100,8 @@ export function VersionsPanel({ open, onClose, onRestored }: Props) {
           className="border-b px-5 py-3 text-xs"
           style={{ borderColor: 'var(--app-border)', color: 'var(--app-text-muted)' }}
         >
-          Admin only. Snapshots are created when you save draft or publish. Restore replaces your
-          working draft (not live until you publish).
+          Up to 50 snapshots kept. Created on each save or publish. Restore replaces your working
+          draft (not live until you publish).
         </p>
         <div className="flex-1 overflow-y-auto px-5 py-3">
           {loading && (
@@ -81,11 +119,16 @@ export function VersionsPanel({ open, onClose, onRestored }: Props) {
             {versions.map((v) => (
               <li
                 key={v.id}
-                className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm hover:border-gray-300"
+                className="theme-muted rounded-lg border px-3 py-2.5 text-sm"
+                style={{ borderColor: 'var(--app-border)' }}
               >
-                <div className="font-medium text-gray-800">{v.label}</div>
-                <div className="mt-0.5 text-xs text-gray-500">
-                  {v.created_at.replace('T', ' ').slice(0, 19)} UTC · {v.task_count} tasks
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{v.label}</span>
+                  {sourceBadge(v.source, v.label)}
+                </div>
+                <div className="mt-0.5 text-xs" style={{ color: 'var(--app-text-muted)' }}>
+                  {v.created_at.replace('T', ' ').slice(0, 19)} UTC · {v.task_count}{' '}
+                  {kind === 'lifecycle' ? 'entries' : 'tasks'}
                 </div>
                 <button
                   type="button"

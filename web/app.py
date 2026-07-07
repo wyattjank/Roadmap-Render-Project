@@ -85,6 +85,35 @@ def require_admin(
         raise HTTPException(status_code=401, detail="Invalid or missing admin token.")
 
 
+def _request_token(
+    request: Request,
+    creds: HTTPAuthorizationCredentials | None,
+) -> str | None:
+    token = creds.credentials if creds else None
+    if not token and request:
+        token = request.query_params.get("token")
+    return token
+
+
+def is_admin(
+    request: Request,
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> bool:
+    if not ADMIN_TOKEN:
+        return False
+    return _request_token(request, creds) == ADMIN_TOKEN
+
+
+def require_live_or_admin(
+    request: Request,
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> None:
+    """Viewers may read published (live) data; draft and writes need admin."""
+    source = request.query_params.get("source", "draft")
+    if source != "live":
+        require_admin(request, creds)
+
+
 def _roadmap_path(source: str) -> Path:
     """live = published (read-only for customers); draft = admin working copy."""
     ensure_draft_from_live(LIVE_CSV, DRAFT_CSV)
@@ -138,8 +167,13 @@ def admin_ui(request: Request):
     return HTMLResponse("<p>UI not built. Run: cd web/frontend && npm install && npm run build</p>", status_code=500)
 
 
+@app.get("/api/auth/status")
+def api_auth_status(admin: bool = Depends(is_admin)):
+    return {"admin": admin}
+
+
 @app.get("/api/timeline")
-def api_timeline(request: Request, _: None = Depends(require_admin)):
+def api_timeline(request: Request, _: None = Depends(require_live_or_admin)):
     source = request.query_params.get("source", "draft")
     roadmap = load_roadmap(_roadmap_path(source))
     releases = load_releases(RELEASES_CSV)
@@ -147,7 +181,7 @@ def api_timeline(request: Request, _: None = Depends(require_admin)):
 
 
 @app.get("/api/roadmap")
-def api_get_roadmap(request: Request, _: None = Depends(require_admin)):
+def api_get_roadmap(request: Request, _: None = Depends(require_live_or_admin)):
     source = request.query_params.get("source", "draft")
     return {"tasks": load_roadmap_records(_roadmap_path(source)), "source": source}
 
@@ -250,7 +284,7 @@ def _lifecycle_path(source: str) -> Path:
 
 
 @app.get("/api/lifecycle")
-def api_get_lifecycle(request: Request, _: None = Depends(require_admin)):
+def api_get_lifecycle(request: Request, _: None = Depends(require_live_or_admin)):
     source = request.query_params.get("source", "draft")
     return {"entries": load_lifecycle(_lifecycle_path(source)), "source": source}
 
@@ -329,8 +363,10 @@ def api_restore_lifecycle_version(version_id: str, _: None = Depends(require_adm
 
 
 @app.post("/api/export/excel")
-def api_export_excel(request: Request, _: None = Depends(require_admin)):
+def api_export_excel(request: Request, creds: HTTPAuthorizationCredentials | None = Depends(bearer)):
     source = request.query_params.get("source", "live")
+    if source != "live":
+        require_admin(request, creds)
     roadmap = load_roadmap(_roadmap_path(source))
     releases = load_releases(RELEASES_CSV)
     if roadmap.empty:

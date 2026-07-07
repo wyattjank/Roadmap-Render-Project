@@ -6,9 +6,10 @@ interface Props {
   appTitle: string;
   onTitleChange: (t: string) => void;
   readOnly: boolean;
+  isAdmin?: boolean;
   titleReadOnly?: boolean;
   showRoadmapControls?: boolean;
-  showAdminActions?: boolean;
+  onSignOutAdmin?: () => void;
   byObjectives: boolean;
   onToggleByObjectives: () => void;
   search: string;
@@ -39,9 +40,10 @@ export function Navbar({
   appTitle,
   onTitleChange,
   readOnly,
+  isAdmin = false,
   titleReadOnly,
   showRoadmapControls = true,
-  showAdminActions = true,
+  onSignOutAdmin,
   byObjectives,
   onToggleByObjectives,
   search,
@@ -86,21 +88,25 @@ export function Navbar({
               onChange={(e) => onTitleChange(e.target.value)}
             />
           )}
-          {readOnly && (
+          {readOnly ? (
             <span className="theme-muted hidden shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase sm:inline">
               Live · read-only
+            </span>
+          ) : (
+            <span className="hidden shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-700 dark:text-amber-300 sm:inline">
+              Admin · editing draft
             </span>
           )}
         </div>
 
-        {!readOnly && showAdminActions && (
+        {!isAdmin ? (
           <div className="flex shrink-0 items-center gap-2">
             <input
               type="password"
-              placeholder="Token"
+              placeholder="Admin token"
               value={tokenInput}
               onChange={(e) => onTokenChange(e.target.value)}
-              className="theme-input w-20 rounded-lg px-2 py-1 text-xs sm:w-24"
+              className="theme-input w-24 rounded-lg px-2 py-1 text-xs sm:w-28"
             />
             <button
               type="button"
@@ -108,9 +114,18 @@ export function Navbar({
               disabled={busy}
               className="theme-muted theme-btn-ghost shrink-0 rounded-lg px-2 py-1.5 text-xs font-medium disabled:opacity-50"
             >
-              Connect
+              Sign in
             </button>
           </div>
+        ) : (
+          <button
+            type="button"
+            onClick={onSignOutAdmin}
+            className="theme-btn-ghost shrink-0 rounded-lg px-2 py-1.5 text-xs font-medium"
+            style={{ color: 'var(--app-text-muted)' }}
+          >
+            Sign out
+          </button>
         )}
 
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
@@ -197,7 +212,7 @@ export function Navbar({
             Excel
           </button>
 
-          {!readOnly && showAdminActions && (
+          {!readOnly && isAdmin && (
             <>
               <button
                 type="button"

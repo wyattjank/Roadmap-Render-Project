@@ -1,37 +1,36 @@
-import { Eye, Layers, Pencil } from 'lucide-react';
+import { Layers, Map } from 'lucide-react';
 
-export type ViewMode = 'edit' | 'readonly' | 'lifecycle';
+export type AppTab = 'roadmap' | 'lifecycle';
 
 interface Props {
-  mode: ViewMode;
-  onModeChange: (mode: ViewMode) => void;
+  tab: AppTab;
+  onTabChange: (tab: AppTab) => void;
 }
 
-const MODES: { id: ViewMode; icon: typeof Pencil; label: string; hint: string }[] = [
-  { id: 'edit', icon: Pencil, label: 'Edit', hint: 'Edit draft — add, delete, save, publish' },
-  { id: 'readonly', icon: Eye, label: 'Standard view', hint: 'Published live roadmap (read-only)' },
+const TABS: { id: AppTab; icon: typeof Map; label: string; hint: string }[] = [
+  { id: 'roadmap', icon: Map, label: 'Roadmap', hint: 'Release roadmap by domain' },
   {
     id: 'lifecycle',
     icon: Layers,
     label: 'Lifecycle',
-    hint: 'Software lifecycle — versions, EOL dates, support windows',
+    hint: 'Software versions, EOL dates, support windows',
   },
 ];
 
-export function Sidebar({ mode, onModeChange }: Props) {
+export function Sidebar({ tab, onTabChange }: Props) {
   return (
     <aside
       className="theme-header flex w-14 shrink-0 flex-col items-center border-r py-4"
       style={{ borderColor: 'var(--app-border)' }}
     >
-      {MODES.map(({ id, icon: Icon, label, hint }) => {
-        const active = mode === id;
+      {TABS.map(({ id, icon: Icon, label, hint }) => {
+        const active = tab === id;
         return (
           <button
             key={id}
             type="button"
             title={hint}
-            onClick={() => onModeChange(id)}
+            onClick={() => onTabChange(id)}
             className={`theme-btn-ghost relative mb-3 flex h-11 w-11 flex-col items-center justify-center rounded-lg transition ${
               active ? 'bg-blue-500/15' : ''
             }`}
@@ -45,7 +44,7 @@ export function Sidebar({ mode, onModeChange }: Props) {
             )}
             <Icon className="h-5 w-5" strokeWidth={1.75} />
             <span className="mt-0.5 text-[8px] font-semibold uppercase leading-none tracking-tight">
-              {id === 'edit' ? 'Edit' : id === 'readonly' ? 'View' : 'Life'}
+              {id === 'roadmap' ? 'Map' : 'Life'}
             </span>
           </button>
         );

@@ -33,6 +33,12 @@ from web.domain_meta import (  # noqa: E402
     publish_meta,
     save_domain_meta,
 )
+from web.lifecycle import (  # noqa: E402
+    ensure_draft_from_live as ensure_lifecycle_draft,
+    load_lifecycle,
+    publish_draft_to_live as publish_lifecycle_draft,
+    save_lifecycle,
+)
 from web.versions import (  # noqa: E402
     create_snapshot,
     ensure_draft_from_live,
@@ -49,6 +55,9 @@ LIVE_DOMAINS = DATA_DIR / "domains.json"
 RELEASES_CSV = DATA_DIR / "releases.csv"
 EXPORT_XLSX = DATA_DIR / "roadmap.xlsx"
 HISTORY_DIR = DATA_DIR / "history"
+LIFECYCLE_HISTORY_DIR = HISTORY_DIR / "lifecycle"
+LIVE_LIFECYCLE = DATA_DIR / "lifecycle.json"
+DRAFT_LIFECYCLE = DATA_DIR / "lifecycle.draft.json"
 ADMIN_TOKEN = os.environ.get("ROADMAP_ADMIN_TOKEN", "")
 
 app = FastAPI(title="Roadmap Admin", version="0.2.0")
@@ -74,6 +83,35 @@ def require_admin(
         token = request.query_params.get("token")
     if token != ADMIN_TOKEN:
         raise HTTPException(status_code=401, detail="Invalid or missing admin token.")
+
+
+def _request_token(
+    request: Request,
+    creds: HTTPAuthorizationCredentials | None,
+) -> str | None:
+    token = creds.credentials if creds else None
+    if not token and request:
+        token = request.query_params.get("token")
+    return token
+
+
+def is_admin(
+    request: Request,
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> bool:
+    if not ADMIN_TOKEN:
+        return False
+    return _request_token(request, creds) == ADMIN_TOKEN
+
+
+def require_live_or_admin(
+    request: Request,
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> None:
+    """Viewers may read published (live) data; draft and writes need admin."""
+    source = request.query_params.get("source", "draft")
+    if source != "live":
+        require_admin(request, creds)
 
 
 def _roadmap_path(source: str) -> Path:
@@ -108,6 +146,11 @@ class ReleasesSave(BaseModel):
     releases: list[dict]
 
 
+class LifecycleSave(BaseModel):
+    entries: list[dict]
+    snapshot_label: str | None = None
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -124,8 +167,13 @@ def admin_ui(request: Request):
     return HTMLResponse("<p>UI not built. Run: cd web/frontend && npm install && npm run build</p>", status_code=500)
 
 
+@app.get("/api/auth/status")
+def api_auth_status(admin: bool = Depends(is_admin)):
+    return {"admin": admin}
+
+
 @app.get("/api/timeline")
-def api_timeline(request: Request, _: None = Depends(require_admin)):
+def api_timeline(request: Request, _: None = Depends(require_live_or_admin)):
     source = request.query_params.get("source", "draft")
     roadmap = load_roadmap(_roadmap_path(source))
     releases = load_releases(RELEASES_CSV)
@@ -133,7 +181,7 @@ def api_timeline(request: Request, _: None = Depends(require_admin)):
 
 
 @app.get("/api/roadmap")
-def api_get_roadmap(request: Request, _: None = Depends(require_admin)):
+def api_get_roadmap(request: Request, _: None = Depends(require_live_or_admin)):
     source = request.query_params.get("source", "draft")
     return {"tasks": load_roadmap_records(_roadmap_path(source)), "source": source}
 
@@ -145,7 +193,13 @@ def api_put_roadmap(body: RoadmapSave, _: None = Depends(require_admin)):
     if body.domain_meta is not None:
         save_domain_meta(DRAFT_DOMAINS, body.domain_meta)
     label = body.snapshot_label or "Draft saved"
-    version = create_snapshot(HISTORY_DIR, DRAFT_CSV, label=label)
+    version = create_snapshot(
+        HISTORY_DIR,
+        DRAFT_CSV,
+        label=label,
+        source_kind="draft",
+        companion=DRAFT_DOMAINS,
+    )
     roadmap = load_roadmap(DRAFT_CSV)
     releases = load_releases(RELEASES_CSV)
     return {
@@ -162,7 +216,13 @@ def api_publish(_: None = Depends(require_admin)):
     ensure_draft_from_live(LIVE_CSV, DRAFT_CSV)
     publish_draft_to_live(DRAFT_CSV, LIVE_CSV)
     publish_meta(DRAFT_DOMAINS, LIVE_DOMAINS)
-    version = create_snapshot(HISTORY_DIR, LIVE_CSV, label="Published to live")
+    version = create_snapshot(
+        HISTORY_DIR,
+        LIVE_CSV,
+        label="Published to live",
+        source_kind="live",
+        companion=LIVE_DOMAINS,
+    )
     roadmap = load_roadmap(LIVE_CSV)
     releases = load_releases(RELEASES_CSV)
     return {
@@ -181,10 +241,21 @@ def api_versions(_: None = Depends(require_admin)):
 @app.post("/api/versions/{version_id}/restore")
 def api_restore_version(version_id: str, _: None = Depends(require_admin)):
     try:
-        meta = restore_version(HISTORY_DIR, version_id, DRAFT_CSV)
+        meta = restore_version(
+            HISTORY_DIR,
+            version_id,
+            DRAFT_CSV,
+            companion_draft=DRAFT_DOMAINS,
+        )
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
-    create_snapshot(HISTORY_DIR, DRAFT_CSV, label=f"Before restore ({version_id})")
+    create_snapshot(
+        HISTORY_DIR,
+        DRAFT_CSV,
+        label=f"Before restore ({version_id})",
+        source_kind="draft",
+        companion=DRAFT_DOMAINS,
+    )
     roadmap = load_roadmap(DRAFT_CSV)
     releases = load_releases(RELEASES_CSV)
     return {
@@ -205,9 +276,97 @@ def api_put_releases(body: ReleasesSave, _: None = Depends(require_admin)):
     return {"saved": len(body.releases)}
 
 
+def _lifecycle_path(source: str) -> Path:
+    ensure_lifecycle_draft(LIVE_LIFECYCLE, DRAFT_LIFECYCLE)
+    if source == "live":
+        return LIVE_LIFECYCLE
+    return DRAFT_LIFECYCLE
+
+
+@app.get("/api/lifecycle")
+def api_get_lifecycle(request: Request, _: None = Depends(require_live_or_admin)):
+    source = request.query_params.get("source", "draft")
+    return {"entries": load_lifecycle(_lifecycle_path(source)), "source": source}
+
+
+@app.put("/api/lifecycle")
+def api_put_lifecycle(body: LifecycleSave, _: None = Depends(require_admin)):
+    """Save lifecycle draft and record a version snapshot."""
+    save_lifecycle(DRAFT_LIFECYCLE, body.entries)
+    label = body.snapshot_label or "Lifecycle draft saved"
+    version = create_snapshot(
+        LIFECYCLE_HISTORY_DIR,
+        DRAFT_LIFECYCLE,
+        label=label,
+        source_kind="draft",
+        file_prefix="lifecycle",
+        item_count=len(body.entries),
+    )
+    return {
+        "saved": len(body.entries),
+        "entries": load_lifecycle(DRAFT_LIFECYCLE),
+        "version": version,
+        "source": "draft",
+    }
+
+
+@app.post("/api/lifecycle/publish")
+def api_publish_lifecycle(_: None = Depends(require_admin)):
+    """Copy lifecycle draft → live."""
+    ensure_lifecycle_draft(LIVE_LIFECYCLE, DRAFT_LIFECYCLE)
+    publish_lifecycle_draft(DRAFT_LIFECYCLE, LIVE_LIFECYCLE)
+    version = create_snapshot(
+        LIFECYCLE_HISTORY_DIR,
+        LIVE_LIFECYCLE,
+        label="Lifecycle published to live",
+        source_kind="live",
+        file_prefix="lifecycle",
+        item_count=len(load_lifecycle(LIVE_LIFECYCLE)),
+    )
+    return {
+        "published": True,
+        "entries": load_lifecycle(LIVE_LIFECYCLE),
+        "version": version,
+        "source": "live",
+    }
+
+
+@app.get("/api/lifecycle/versions")
+def api_lifecycle_versions(_: None = Depends(require_admin)):
+    return {"versions": list_versions(LIFECYCLE_HISTORY_DIR)}
+
+
+@app.post("/api/lifecycle/versions/{version_id}/restore")
+def api_restore_lifecycle_version(version_id: str, _: None = Depends(require_admin)):
+    try:
+        meta = restore_version(
+            LIFECYCLE_HISTORY_DIR,
+            version_id,
+            DRAFT_LIFECYCLE,
+            file_prefix="lifecycle",
+        )
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    create_snapshot(
+        LIFECYCLE_HISTORY_DIR,
+        DRAFT_LIFECYCLE,
+        label=f"Before lifecycle restore ({version_id})",
+        source_kind="draft",
+        file_prefix="lifecycle",
+        item_count=len(load_lifecycle(DRAFT_LIFECYCLE)),
+    )
+    return {
+        "restored": version_id,
+        "meta": meta,
+        "entries": load_lifecycle(DRAFT_LIFECYCLE),
+    }
+
+
 @app.post("/api/export/excel")
-def api_export_excel(request: Request, _: None = Depends(require_admin)):
+def api_export_excel(request: Request, creds: HTTPAuthorizationCredentials | None = Depends(bearer)):
     source = request.query_params.get("source", "live")
+    if source != "live":
+        require_admin(request, creds)
     roadmap = load_roadmap(_roadmap_path(source))
     releases = load_releases(RELEASES_CSV)
     if roadmap.empty:

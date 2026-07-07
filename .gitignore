@@ -16,6 +16,7 @@ web/static/dist/
 
 # Admin draft + version snapshots (local)
 roadmap.draft.csv
+lifecycle.draft.json
 history/
 
 # OS

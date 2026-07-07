@@ -12,6 +12,18 @@ export interface VersionEntry {
   label: string;
   actor: string;
   task_count: number;
+  source?: 'draft' | 'live';
+  domains_filename?: string;
+}
+
+export interface LifecycleEntry {
+  id: string;
+  software: string;
+  version: string;
+  status: 'active' | 'eol' | 'planned' | 'deprecated';
+  eol_date: string | null;
+  active_until: string | null;
+  notes: string;
 }
 
 export function getToken(): string {
@@ -27,9 +39,20 @@ export function setToken(token: string) {
   sessionStorage.setItem(TOKEN_KEY, token);
 }
 
-function headers(token: string): HeadersInit {
-  if (!token) throw new Error('No admin token');
-  return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+function authHeaders(token?: string, json = false): HeadersInit {
+  const h: Record<string, string> = {};
+  const t = (token ?? getToken()).trim();
+  if (t) h.Authorization = `Bearer ${t}`;
+  if (json) h['Content-Type'] = 'application/json';
+  return h;
+}
+
+function requireToken(source: DataSource, token?: string): string | undefined {
+  const t = (token ?? getToken()).trim();
+  if (source === 'draft' && !t) {
+    throw new Error('Admin token required to edit draft.');
+  }
+  return t || undefined;
 }
 
 async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
@@ -70,12 +93,21 @@ export async function fetchTimeline(
   source: DataSource = 'draft',
   token?: string,
 ): Promise<TimelinePayload> {
-  const t = token ?? getToken();
+  requireToken(source, token);
   const res = await fetchWithTimeout(`/api/timeline?source=${source}`, {
-    headers: headers(t),
+    headers: authHeaders(token),
   });
   if (!res.ok) throw new Error(await parseError(res));
   return res.json();
+}
+
+export async function checkAdmin(token?: string): Promise<boolean> {
+  const res = await fetchWithTimeout('/api/auth/status', {
+    headers: authHeaders(token),
+  });
+  if (!res.ok) return false;
+  const body = (await res.json()) as { admin?: boolean };
+  return !!body.admin;
 }
 
 export async function saveRoadmap(
@@ -85,7 +117,7 @@ export async function saveRoadmap(
 ) {
   const res = await fetchWithTimeout('/api/roadmap', {
     method: 'PUT',
-    headers: headers(getToken()),
+    headers: authHeaders(undefined, true),
     body: JSON.stringify({
       tasks,
       domain_meta: domainMeta ?? {},
@@ -103,7 +135,7 @@ export async function saveRoadmap(
 export async function publishLive() {
   const res = await fetchWithTimeout('/api/publish', {
     method: 'POST',
-    headers: headers(getToken()),
+    headers: authHeaders(undefined, true),
   });
   if (!res.ok) throw new Error(await parseError(res));
   return res.json() as Promise<{
@@ -114,7 +146,7 @@ export async function publishLive() {
 }
 
 export async function fetchVersions() {
-  const res = await fetchWithTimeout('/api/versions', { headers: headers(getToken()) });
+  const res = await fetchWithTimeout('/api/versions', { headers: authHeaders() });
   if (!res.ok) throw new Error(await parseError(res));
   return res.json() as Promise<{ versions: VersionEntry[] }>;
 }
@@ -122,16 +154,73 @@ export async function fetchVersions() {
 export async function restoreVersion(versionId: string) {
   const res = await fetchWithTimeout(`/api/versions/${versionId}/restore`, {
     method: 'POST',
-    headers: headers(getToken()),
+    headers: authHeaders(undefined, true),
   });
   if (!res.ok) throw new Error(await parseError(res));
   return res.json() as Promise<{ timeline: TimelinePayload; restored: string }>;
 }
 
+export async function fetchLifecycle(source: DataSource = 'draft') {
+  requireToken(source);
+  const res = await fetchWithTimeout(`/api/lifecycle?source=${source}`, {
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{ entries: LifecycleEntry[]; source: DataSource }>;
+}
+
+export async function saveLifecycle(
+  entries: LifecycleEntry[],
+  snapshotLabel?: string,
+) {
+  const res = await fetchWithTimeout('/api/lifecycle', {
+    method: 'PUT',
+    headers: authHeaders(undefined, true),
+    body: JSON.stringify({ entries, snapshot_label: snapshotLabel }),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{
+    saved: number;
+    entries: LifecycleEntry[];
+    version: VersionEntry;
+  }>;
+}
+
+export async function publishLifecycle() {
+  const res = await fetchWithTimeout('/api/lifecycle/publish', {
+    method: 'POST',
+    headers: authHeaders(undefined, true),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{
+    published: boolean;
+    entries: LifecycleEntry[];
+    version: VersionEntry;
+  }>;
+}
+
+export async function fetchLifecycleVersions() {
+  const res = await fetchWithTimeout('/api/lifecycle/versions', {
+    headers: authHeaders(),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{ versions: VersionEntry[] }>;
+}
+
+export async function restoreLifecycleVersion(versionId: string) {
+  const res = await fetchWithTimeout(`/api/lifecycle/versions/${versionId}/restore`, {
+    method: 'POST',
+    headers: authHeaders(undefined, true),
+  });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<{ entries: LifecycleEntry[]; restored: string }>;
+}
+
 export async function exportExcel(source: DataSource = 'live'): Promise<Blob> {
+  requireToken(source);
   const res = await fetchWithTimeout(`/api/export/excel?source=${source}`, {
     method: 'POST',
-    headers: headers(getToken()),
+    headers: authHeaders(),
   });
   if (!res.ok) throw new Error(await parseError(res));
   return res.blob();

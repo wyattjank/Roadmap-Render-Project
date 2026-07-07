@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Board } from './components/Board';
 import { FeatureDrawer } from './components/FeatureDrawer';
+import { LifecycleRoadmap } from './components/LifecycleRoadmap';
 import { Navbar } from './components/Navbar';
-import { Sidebar, type ViewMode } from './components/Sidebar';
+import { Sidebar, type AppTab } from './components/Sidebar';
 import { VersionsPanel } from './components/VersionsPanel';
 import {
+  checkAdmin,
   exportExcel,
   fetchTimeline,
   getToken,
@@ -28,25 +30,28 @@ import { applyTheme, getStoredTheme, type Theme } from './lib/theme';
 
 export default function App() {
   const [tokenInput, setTokenInput] = useState(getToken());
-  const [viewMode, setViewMode] = useState<ViewMode>('edit');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [activeTab, setActiveTab] = useState<AppTab>('roadmap');
   const [state, setState] = useState<RoadmapState | null>(null);
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(null);
   const [versionsOpen, setVersionsOpen] = useState(false);
+  const [lifecycleSaveSignal, setLifecycleSaveSignal] = useState(0);
+  const [lifecyclePublishSignal, setLifecyclePublishSignal] = useState(0);
+  const [lifecycleReloadSignal, setLifecycleReloadSignal] = useState(0);
   const [byObjectives, setByObjectives] = useState(true);
   const [search, setSearch] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterColors, setFilterColors] = useState<Set<string>>(new Set());
   const [filterObjectiveIds, setFilterObjectiveIds] = useState<Set<string>>(new Set());
-  const initialToken = getToken();
-  const [status, setStatus] = useState(
-    initialToken
-      ? 'Click Connect or wait…'
-      : 'Enter admin token (e.g. dev-admin) and click Connect.',
-  );
+  const [status, setStatus] = useState('Loading…');
   const [busy, setBusy] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => getStoredTheme());
   const autoConnectDone = useRef(false);
+
+  const readOnly = !isAdmin;
+  const dataSource: DataSource = isAdmin ? 'draft' : 'live';
+  const isLifecycle = activeTab === 'lifecycle';
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
@@ -56,22 +61,12 @@ export default function App() {
     });
   }, []);
 
-  const readOnly = viewMode === 'readonly';
-  const dataSource: DataSource = readOnly ? 'live' : 'draft';
-
   const loadTimeline = useCallback(
     async (source: DataSource, tokenOverride?: string) => {
-      const t = (tokenOverride ?? tokenInput).trim();
-      if (!t) {
-        setStatus('Enter admin token (e.g. dev-admin) and click Connect.');
-        return;
-      }
-      setToken(t);
-      setTokenInput(t);
       setBusy(true);
-      setStatus(source === 'live' ? 'Loading published view…' : 'Loading draft…');
+      setStatus(source === 'live' ? 'Loading published roadmap…' : 'Loading draft…');
       try {
-        const tl = await fetchTimeline(source, t);
+        const tl = await fetchTimeline(source, tokenOverride);
         setState(timelineToState(tl));
         const label = source === 'live' ? 'Published (live)' : 'Draft';
         setStatus(`Loaded ${tl.tasks.length} tasks · ${label}`);
@@ -82,29 +77,75 @@ export default function App() {
         setBusy(false);
       }
     },
-    [tokenInput],
+    [],
   );
 
-  const connect = useCallback(
-    () => loadTimeline(dataSource),
-    [loadTimeline, dataSource],
-  );
+  const connectAdmin = useCallback(async () => {
+    const t = tokenInput.trim();
+    if (!t) {
+      setStatus('Enter admin token to enable editing.');
+      return;
+    }
+    setToken(t);
+    setBusy(true);
+    setStatus('Verifying admin access…');
+    try {
+      const ok = await checkAdmin(t);
+      if (!ok) {
+        setIsAdmin(false);
+        setStatus('Invalid admin token.');
+        return;
+      }
+      setIsAdmin(true);
+      await loadTimeline('draft', t);
+    } catch (e) {
+      setIsAdmin(false);
+      setStatus(`Error: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setBusy(false);
+    }
+  }, [tokenInput, loadTimeline]);
+
+  const signOutAdmin = useCallback(() => {
+    setIsAdmin(false);
+    setToken('');
+    setTokenInput('');
+    sessionStorage.removeItem('roadmap_admin_token');
+    setSelectedFeatureId(null);
+    void loadTimeline('live');
+    setLifecycleReloadSignal((n) => n + 1);
+    setStatus('Signed out · viewing published data');
+  }, [loadTimeline]);
 
   useEffect(() => {
     if (autoConnectDone.current) return;
+    autoConnectDone.current = true;
+
     const q = new URLSearchParams(window.location.search).get('token');
     const t = (q || getToken()).trim();
     if (q) setTokenInput(q);
-    if (!t) return;
-    autoConnectDone.current = true;
-    void loadTimeline('draft', t);
+
+    void (async () => {
+      if (t) {
+        setToken(t);
+        const ok = await checkAdmin(t);
+        if (ok) {
+          setIsAdmin(true);
+          await loadTimeline('draft', t);
+          return;
+        }
+      }
+      await loadTimeline('live');
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
+  const handleTabChange = (tab: AppTab) => {
+    setActiveTab(tab);
     setSelectedFeatureId(null);
-    void loadTimeline(mode === 'readonly' ? 'live' : 'draft');
+    if (tab === 'lifecycle') {
+      setLifecycleReloadSignal((n) => n + 1);
+    }
   };
 
   const selectedFeature = useMemo(
@@ -235,7 +276,12 @@ export default function App() {
   );
 
   const handleSave = async () => {
-    if (!state || readOnly) return;
+    if (!isAdmin) return;
+    if (isLifecycle) {
+      setLifecycleSaveSignal((n) => n + 1);
+      return;
+    }
+    if (!state) return;
     setBusy(true);
     setStatus('Saving draft…');
     try {
@@ -254,10 +300,14 @@ export default function App() {
   };
 
   const handlePublish = async () => {
-    if (!state || readOnly) return;
-    if (!window.confirm('Publish draft to live? Customers/read-only view will see this.')) {
+    if (!isAdmin) return;
+    if (isLifecycle) {
+      if (!window.confirm('Publish lifecycle draft to live? Viewers will see these changes.')) return;
+      setLifecyclePublishSignal((n) => n + 1);
       return;
     }
+    if (!state) return;
+    if (!window.confirm('Publish draft to live? All viewers will see this.')) return;
     setBusy(true);
     setStatus('Publishing…');
     try {
@@ -267,7 +317,7 @@ export default function App() {
         stateToDomainMeta(state),
       );
       const res = await publishLive();
-      setStatus(`Published to live (${res.version.id}). Switch to Standard view to preview.`);
+      setStatus(`Published to live (${res.version.id})`);
     } catch (e) {
       setStatus(`Publish failed: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
@@ -278,7 +328,7 @@ export default function App() {
   const handleExport = async () => {
     setBusy(true);
     try {
-      const blob = await exportExcel(readOnly ? 'live' : 'draft');
+      const blob = await exportExcel(dataSource);
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = 'roadmap.xlsx';
@@ -304,9 +354,13 @@ export default function App() {
   return (
     <div className="theme-surface flex h-full flex-col overflow-hidden">
       <Navbar
-        appTitle={state?.appTitle ?? 'Roadmap'}
+        appTitle={isLifecycle ? 'Software Lifecycle' : (state?.appTitle ?? 'Roadmap')}
         onTitleChange={(appTitle) => state && setState({ ...state, appTitle })}
         readOnly={readOnly}
+        isAdmin={isAdmin}
+        titleReadOnly={readOnly || isLifecycle}
+        showRoadmapControls={!isLifecycle}
+        onSignOutAdmin={signOutAdmin}
         byObjectives={byObjectives}
         onToggleByObjectives={() => setByObjectives((v) => !v)}
         search={search}
@@ -333,13 +387,13 @@ export default function App() {
           })
         }
         objectives={state?.objectives ?? []}
-        onConnect={connect}
+        onConnect={connectAdmin}
         onSave={handleSave}
         onPublish={handlePublish}
         onVersions={() => setVersionsOpen(true)}
         onExport={handleExport}
         busy={busy}
-        canSave={!!state}
+        canSave={isAdmin && (isLifecycle || !!state)}
         status={status}
         tokenInput={tokenInput}
         onTokenChange={setTokenInput}
@@ -348,11 +402,23 @@ export default function App() {
       />
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <Sidebar mode={viewMode} onModeChange={handleModeChange} />
+        <Sidebar tab={activeTab} onTabChange={handleTabChange} />
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <main className="theme-surface flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-            {!state ? (
+            {isLifecycle ? (
+              <LifecycleRoadmap
+                readOnly={readOnly}
+                dataSource={dataSource}
+                onStatus={setStatus}
+                onBusy={setBusy}
+                saveSignal={lifecycleSaveSignal}
+                publishSignal={lifecyclePublishSignal}
+                onSaved={() => setLifecycleReloadSignal((n) => n + 1)}
+                onPublished={() => setLifecycleReloadSignal((n) => n + 1)}
+                key={`${lifecycleReloadSignal}-${dataSource}`}
+              />
+            ) : !state ? (
               <div
                 className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center text-sm"
                 style={{ color: 'var(--app-text-muted)' }}
@@ -360,24 +426,6 @@ export default function App() {
                 <p className={status.startsWith('Error') ? 'font-medium text-red-500' : ''}>
                   {status}
                 </p>
-                {!readOnly && (
-                  <>
-                    <p className="text-xs">
-                      Admin: set{' '}
-                      <code className="theme-muted rounded px-1">ROADMAP_ADMIN_TOKEN</code> and open{' '}
-                      <code className="theme-muted rounded px-1">
-                        http://127.0.0.1:8080/?token=dev-admin
-                      </code>
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => connect()}
-                      className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
-                    >
-                      Connect
-                    </button>
-                  </>
-                )}
               </div>
             ) : byObjectives ? (
               <Board
@@ -408,7 +456,7 @@ export default function App() {
         </div>
       </div>
 
-      {state && selectedFeature && (
+      {state && selectedFeature && !isLifecycle && (
         <FeatureDrawer
           feature={selectedFeature}
           timeline={state.timeline}
@@ -419,11 +467,20 @@ export default function App() {
         />
       )}
 
-      <VersionsPanel
-        open={versionsOpen}
-        onClose={() => setVersionsOpen(false)}
-        onRestored={() => void loadTimeline('draft')}
-      />
+      {isAdmin && (
+        <VersionsPanel
+          open={versionsOpen}
+          onClose={() => setVersionsOpen(false)}
+          kind={isLifecycle ? 'lifecycle' : 'roadmap'}
+          onRestored={() => {
+            if (isLifecycle) {
+              setLifecycleReloadSignal((n) => n + 1);
+            } else {
+              void loadTimeline('draft');
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
